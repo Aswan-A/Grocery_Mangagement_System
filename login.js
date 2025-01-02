@@ -10,7 +10,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         message.textContent = 'Login successful! Redirecting...';
         // Simulate redirection
         setTimeout(() => {
-            window.location.href = 'manager.html'; // Replace with your dashboard URL
+            window.location.href = 'manager.html'; // Redirect to the manager dashboard
         }, 1500);
     } else {
         message.style.color = 'red';

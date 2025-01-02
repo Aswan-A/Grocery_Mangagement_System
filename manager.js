@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.tab');
     const links = document.querySelectorAll('.sidebar a');
 
+    // Tab Navigation
     links.forEach(link => {
         link.addEventListener('click', event => {
             event.preventDefault();
@@ -36,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function populateTable(tableId, data) {
         const tbody = document.getElementById(tableId).querySelector('tbody');
-        tbody.innerHTML = '';
+        tbody.innerHTML = '';  // Clear existing rows
         data.forEach(row => {
             const tr = document.createElement('tr');
             for (const key in row) {
