@@ -85,7 +85,6 @@ body {
     color: #34495e;
 }
 
-/* Tab Styles */
 .tab {
     display: none;
 }
@@ -94,7 +93,6 @@ body {
     display: block;
 }
 
-/* Button Styles */
 button {
     padding: 12px 20px;
     background-color: #3498db;
