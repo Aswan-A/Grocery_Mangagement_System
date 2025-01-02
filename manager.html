@@ -17,6 +17,25 @@
                     <li><a href="#sales" id="salesLink">Sales Report</a></li>
                 </ul>
             </nav>
+            <div class="filters">
+                <h3>Filters</h3>
+                <div id="stockFilter" class="filter-section">
+                    <label for="categoryFilter">Category:</label>
+                    <select id="categoryFilter">
+                        <option value="">All</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Bakery">Bakery</option>
+                    </select>
+                </div>
+                <div id="attendanceFilter" class="filter-section">
+                    <label for="dateFilter">Attendance Date:</label>
+                    <input type="date" id="dateFilter">
+                </div>
+                <div id="salesFilter" class="filter-section">
+                    <label for="salesDateFilter">Sales Date:</label>
+                    <input type="date" id="salesDateFilter">
+                </div>
+            </div>
         </aside>
         <main class="content">
             <section id="stocks" class="tab active">
