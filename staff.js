@@ -28,7 +28,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     populateTable('stockTable', stockData);
     populateTable('attendanceTable', attendanceData);
+    
 
+    // Show the popup
+    addStockBtn.addEventListener('click', () => {
+        popup.style.display = 'flex'; // Show the popup
+    });
+    
+    // Close the popup
+    closePopupBtn.addEventListener('click', () => {
+        popup.style.display = 'none'; // Hide the popup
+    });
+    
+
+    
+    // Handle form submission for adding stock
+    stockForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent form from refreshing the page
+    
+        // Get form values
+        const product = document.getElementById('product').value;
+        const category = document.getElementById('category').value;
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const price = parseFloat(document.getElementById('price').value);
+    
+        // Create stock item object
+        const stockItem = { product, category, quantity, price };
+    
+        // Push stock item to stock data array
+        stockData.push(stockItem);
+    
+        // Clear form inputs
+        stockForm.reset();
+    
+        // Close the popup after adding stock
+        popup.style.display = 'none';
+    
+        // Optionally, you can call a function to update your table here
+        populateTable('stockTable', stockData);
+    });
+    
+    // Function to populate a stock table (can be customized as needed)
     function populateTable(tableId, data) {
         const tbody = document.getElementById(tableId).querySelector('tbody');
         tbody.innerHTML = '';
@@ -51,22 +91,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+
+
+
+
+
+
+
+
     function deleteRow(tableId, index) {
         const table = document.getElementById(tableId);
         const tbody = table.querySelector('tbody');
         tbody.deleteRow(index);
     }
 
-    // Add new stock
-    document.getElementById('addStockBtn').addEventListener('click', () => {
-        const newStock = prompt('Enter new stock details (name, category, quantity, price):');
-        if (newStock) {
-            const [product, category, quantity, price] = newStock.split(',');
-            const stockItem = { product, category, quantity: parseInt(quantity), price };
-            stockData.push(stockItem);
-            populateTable('stockTable', stockData);
-        }
-    });
+    
 
     // Add new employee attendance
     document.getElementById('addEmployeeBtn').addEventListener('click', () => {
