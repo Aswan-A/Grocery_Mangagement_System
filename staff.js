@@ -29,27 +29,65 @@ document.addEventListener('DOMContentLoaded', function () {
     populateTable('stockTable', stockData);
     populateTable('attendanceTable', attendanceData);
 
-    function populateTable(tableId, data) {
-        const tbody = document.getElementById(tableId).querySelector('tbody');
-        tbody.innerHTML = '';
-        data.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            for (const key in row) {
-                const td = document.createElement('td');
-                td.textContent = row[key];
-                tr.appendChild(td);
-            }
-            const deleteTd = document.createElement('td');
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.addEventListener('click', () => {
-                deleteRow(tableId, index);
-            });
-            deleteTd.appendChild(deleteBtn);
-            tr.appendChild(deleteTd);
-            tbody.appendChild(tr);
-        });
-    }
+    // Sample stock data array
+
+// Get the modal and buttons
+const addStockBtn = document.getElementById('addStockBtn');
+const closePopupBtn = document.getElementById('closePopupBtn');
+const popup = document.getElementById('popup');
+const stockForm = document.getElementById('stockForm');
+
+// Open the popup for adding stock
+addStockBtn.addEventListener('click', () => {
+    popup.style.display = 'flex'; // Show the popup
+});
+
+// Close the popup
+closePopupBtn.addEventListener('click', () => {
+    popup.style.display = 'none'; // Hide the popup
+});
+
+// Handle form submission for adding stock
+stockForm.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent form from refreshing the page
+
+    // Get form values
+    const product = document.getElementById('product').value;
+    const category = document.getElementById('category').value;
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const price = parseFloat(document.getElementById('price').value);
+
+    // Create stock item object
+    const stockItem = { product, category, quantity, price };
+
+    // Push stock item to stock data array
+    stockData.push(stockItem);
+
+    // Clear form inputs
+    stockForm.reset();
+
+    // Close the popup after adding stock
+    popup.style.display = 'none';
+
+    // Optionally, you can call a function to update your table here
+    populateTable('stockTable', stockData);
+});
+
+// Function to populate a stock table (can be customized as needed)
+function populateTable(tableId, data) {
+    const table = document.getElementById(tableId);
+    table.innerHTML = ''; // Clear existing table data
+
+    // Create new table rows based on the stock data
+    data.forEach(item => {
+        const row = table.insertRow();
+        row.insertCell(0).textContent = item.product;
+        row.insertCell(1).textContent = item.category;
+        row.insertCell(2).textContent = item.quantity;
+        row.insertCell(3).textContent = item.price;
+    });
+}
+
 
     function deleteRow(tableId, index) {
         const table = document.getElementById(tableId);
@@ -57,16 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.deleteRow(index);
     }
 
-    // Add new stock
-    document.getElementById('addStockBtn').addEventListener('click', () => {
-        const newStock = prompt('Enter new stock details (name, category, quantity, price):');
-        if (newStock) {
-            const [product, category, quantity, price] = newStock.split(',');
-            const stockItem = { product, category, quantity: parseInt(quantity), price };
-            stockData.push(stockItem);
-            populateTable('stockTable', stockData);
-        }
-    });
 
     // Add new employee attendance
     document.getElementById('addEmployeeBtn').addEventListener('click', () => {
