@@ -40,7 +40,14 @@ document.addEventListener('DOMContentLoaded', function () {
         popup.style.display = 'none'; // Hide the popup
     });
     
-
+    addEmployeeBtn.addEventListener('click', () => {
+        popup2.style.display = 'flex'; // Show the popup
+    });
+    
+    // Close the popup
+    closePopupBtn2.addEventListener('click', () => {
+        popup2.style.display = 'none'; // Hide the popup
+    });
     
     // Handle form submission for adding stock
     stockForm.addEventListener('submit', (e) => {
@@ -67,7 +74,30 @@ document.addEventListener('DOMContentLoaded', function () {
         // Optionally, you can call a function to update your table here
         populateTable('stockTable', stockData);
     });
+
+    employeeForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent form from refreshing the page
     
+        // Get form values
+        const Name = document.getElementById('name').value;
+        const Date = document.getElementById('date').value;
+        const Status = document.getElementById('status').value;
+    
+        // Create stock item object
+        const employeedet = { Name, Date, Status };
+    
+        // Push stock item to stock data array
+        attendanceData.push(employeedet);
+    
+        // Clear form inputs
+        employeeForm.reset();
+    
+        // Close the popup after adding stock
+        popup2.style.display = 'none';
+    
+        // Optionally, you can call a function to update your table here
+        populateTable('attendanceTable', attendanceData);
+    });
     // Function to populate a stock table (can be customized as needed)
     function populateTable(tableId, data) {
         const tbody = document.getElementById(tableId).querySelector('tbody');
@@ -108,13 +138,5 @@ document.addEventListener('DOMContentLoaded', function () {
     
 
     // Add new employee attendance
-    document.getElementById('addEmployeeBtn').addEventListener('click', () => {
-        const newEmployee = prompt('Enter new employee name:');
-        if (newEmployee) {
-            const status = prompt('Enter attendance status (Present/Absent):');
-            const date = new Date().toLocaleDateString();
-            attendanceData.push({ name: newEmployee, date, status });
-            populateTable('attendanceTable', attendanceData);
-        }
-    });
+    
 });

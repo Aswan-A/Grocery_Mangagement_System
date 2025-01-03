@@ -70,7 +70,24 @@
                 <h1>Employee Attendance</h1>
                 <input type="text" id="attendanceSearch" placeholder="Search attendance...">
                 <div class="attendance-actions">
-                    <button id="addEmployeeBtn">Add New Employee</button>
+                    <button id="addEmployeeBtn">Add New Attendance</button>
+                    <div id="popup2" class="popup2">
+                        <div class="popup-content2">
+                            <span id="closePopupBtn2" class="close-btn">&times;</span>
+                            <h2>Add Employee Attendance</h2>
+                            <form id="employeeForm">
+                                <label for="id">Employee ID:</label>
+                                <input type="text" id="id" required><br>
+                                <label for="name">Employee Name:</label>
+                                <input type="text" id="name" required><br>
+                                <label for="date">Date:</label>
+                                <input type="text" id="date" required><br>
+                                <label for="status">Status:</label>
+                                <input type="text" id="status" required><br>
+                                <button type="submit">Add Attendance</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
                 <table id="attendanceTable">
                     <thead>
