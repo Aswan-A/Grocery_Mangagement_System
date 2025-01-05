@@ -81,10 +81,16 @@
             <!-- Employee Attendance Tab -->
             <section id="attendance" class="tab">
                 <h1>Employee Attendance</h1>
-                <input type="text" id="attendanceSearch" placeholder="Search attendance...">
-                <div class="attendance-actions">
-                    <button id="addEmployeeBtn">Add New Employee</button>
+                <input type="text" id="attendanceSearch" placeholder="Search employee...">
+                <div class="attendance-actions" >
+                    <button id="addEmployeeBtn" style="border-radius: 5px;">Add New Employee</button>
+                    <div class="attendance-container" >
+                        <input type="text" id="attendanceId" placeholder="Enter ID" style="width: 120px;">
+                        <button id="attendanceBtn">Enter</button>
+                    </div>
                 </div>
+                
+                
                 
                 <!-- Employee Attendance Table -->
                 <table id="attendanceTable">    

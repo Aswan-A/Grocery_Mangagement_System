@@ -254,6 +254,22 @@ input[type="text"]:focus {
 /* Stock and Attendance Actions */
 .stock-actions, .attendance-actions {
     margin-top: 20px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    border-radius:5px;
+}
+
+#attendanceBtn {
+    border-radius:5px;
+    padding: 5px 10px; 
+    font-size: 15px; 
+    line-height: 2;}
+
+.attendance-container{
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
 }
 
 .stock-actions button,

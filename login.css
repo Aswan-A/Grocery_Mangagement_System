@@ -1,17 +1,19 @@
 body {
     font-family: 'Poppins', Arial, sans-serif;
-    background: linear-gradient(to top, #6a11cb, #2575fc);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    color: #fff;
+    background-image: url('grocery-storephoto.png'); 
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-position: center center;        
 }
 
 .login-container {
-    background-color: #fff;
+    background-color: #F5F5F5;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     padding: 30px 40px;
