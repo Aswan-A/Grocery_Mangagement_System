@@ -6,24 +6,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const popup = document.getElementById('popup');
     const closePopupBtn = document.getElementById('closePopupBtn');
     const stockForm = document.getElementById('stockForm');
-    const stockSubmitBtn = document.getElementById('stockSubmitBtn');
-    const warningMessage = document.createElement('div'); // For displaying error messages
     const stockData = [
         { productId: 'P001', product: 'Apples', brand: 'Brand A', category: 'Fruits', quantity: 150, price: 1.00 },
         { productId: 'P002', product: 'Bread', brand: 'Brand B', category: 'Bakery', quantity: 80, price: 2.50 }
     ];
-    const attendanceData = [
-        { employeeName: 'John Doe', date: '2025-01-05', status: 'Present' },
-        { employeeName: 'Jane Smith', date: '2025-01-05', status: 'Absent' }
-    ];
+    let currentStockIndex = null;
 
-    // Set up the warning message container
-    warningMessage.style.color = 'red';
-    warningMessage.style.marginBottom = '10px';
-    warningMessage.style.fontSize = '14px';
-    warningMessage.style.display = 'none'; // Initially hidden
-    // Insert warning message above the form inside the popup
-    popup.querySelector('.stockForm').insertBefore(warningMessage, stockSubmitBtn);
+    // Employee Management Variables
+    const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+    const employeePopup = document.getElementById('employeePopup');
+    const closeEmployeePopupBtn = document.getElementById('closeEmployeePopupBtn');
+    const employeeForm = document.getElementById('employeeForm');
+    const employeeData = [
+        { employeeId: 'E001', employeeName: 'John Doe', mobileNumber: '123-456-7890', joinDate: '2020-05-15' },
+        { employeeId: 'E002', employeeName: 'Jane Smith', mobileNumber: '987-654-3210', joinDate: '2021-09-10' }
+    ];
+    let currentEmployeeIndex = null;
+
+    // Employee Details Popup Variables
+    const employeeDetailsPopup = document.getElementById('employeeDetailsPopup');
+    const closeEmployeeDetailsPopup = document.getElementById('closeEmployeeDetailsPopup');
+    const editEmployeeBtn = document.getElementById('editEmployeeBtn');
+    const deleteEmployeeBtn = document.getElementById('deleteEmployeeBtn');
 
     // Tab navigation functionality
     links.forEach(link => {
@@ -39,19 +43,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Populate stock table on page load
-    populateTable('stockTable', stockData);
-    populateTable('attendanceTable', attendanceData); // Add this line to populate employee table
+    populateTable('stockTable', stockData, 'stock');
 
     // Show the stock popup
     addStockBtn.addEventListener('click', () => {
+        document.getElementById('popup').querySelector('h2').textContent = 'Add Stock'; 
+                stockSubmitBtn.textContent = 'Add Stock';
         popup.style.display = 'flex'; // Show the popup
-        warningMessage.style.display = 'none'; // Hide any previous warning messages
+        stockForm.reset(); // Reset the form
+        currentStockIndex = null; // Reset index for new stock
     });
 
     // Close the stock popup
     closePopupBtn.addEventListener('click', () => {
         popup.style.display = 'none'; // Hide the popup
-        warningMessage.style.display = 'none'; // Hide warning message on close
     });
 
     // Handle form submission for adding stock
@@ -66,36 +71,29 @@ document.addEventListener('DOMContentLoaded', function () {
         const quantity = parseInt(document.getElementById('quantity').value);
         const price = parseFloat(document.getElementById('price').value);
 
-        // Validation: Check for negative quantity or price
-        if (quantity < 0 || price < 0) {
-            // Show the appropriate warning message
-            if (quantity < 0) {
-                warningMessage.textContent = "Quantity cannot be negative.";
-            } else if (price < 0) {
-                warningMessage.textContent = "Price cannot be negative.";
-            }
-            warningMessage.style.display = 'block'; // Show the warning message
-            return; // Prevent the form submission
-        }
-
         // Create stock item object
         const stockItem = { productId, product, brand, category, quantity, price };
 
-        // Push stock item to stock data array
-        stockData.push(stockItem);
+        // If editing an existing stock item
+        if (currentStockIndex !== null) {
+            stockData[currentStockIndex] = stockItem;
+        } else {
+            // Push stock item to stock data array
+            stockData.push(stockItem);
+        }
 
         // Clear form inputs
         stockForm.reset();
 
-        // Close the popup after adding stock
+        // Close the popup after adding/updating stock
         popup.style.display = 'none';
 
-        // Optionally, you can call a function to update your table here
-        populateTable('stockTable', stockData);
+        // Update the stock table
+        populateTable('stockTable', stockData, 'stock');
     });
 
-    // Function to populate a stock or attendance table
-    function populateTable(tableId, data) {
+    // Function to populate a stock table
+    function populateTable(tableId, data, type) {
         const tbody = document.getElementById(tableId).querySelector('tbody');
         tbody.innerHTML = '';  // Clear the table body before repopulating
 
@@ -107,87 +105,156 @@ document.addEventListener('DOMContentLoaded', function () {
                 tr.appendChild(td);
             }
 
-            // Add delete button for stock and attendance tables
-            const deleteTd = document.createElement('td');
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm');
-            deleteBtn.addEventListener('click', () => {
-                deleteRow(tableId, index);
+            // Add the view button for stock or employee
+            const actionsTd = document.createElement('td');
+            const viewBtn = document.createElement('button');
+            viewBtn.textContent = 'View';
+            viewBtn.classList.add('btn', 'btn-info', 'btn-sm');
+            viewBtn.addEventListener('click', () => {
+                if (type === 'stock') {
+                    showStockDetails(index);
+                } else {
+                    showEmployeeDetails(index);
+                }
             });
-            deleteTd.appendChild(deleteBtn);
-            tr.appendChild(deleteTd);
+            actionsTd.appendChild(viewBtn);
+            tr.appendChild(actionsTd);
+
             tbody.appendChild(tr);
         });
     }
 
-    // Function to delete a row
-    function deleteRow(tableId, index) {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector('tbody');
-        tbody.deleteRow(index);
+    // Show stock details in the popup
+    function showStockDetails(index) {
+        const stockItem = stockData[index];
+        const stockDetails = document.getElementById('stockDetails');
+        stockDetails.innerHTML = `
+            <p><strong>Product ID:</strong> ${stockItem.productId}</p>
+            <p><strong>Product Name:</strong> ${stockItem.product}</p>
+            <p><strong>Brand:</strong> ${stockItem.brand}</p>
+            <p><strong>Category:</strong> ${stockItem.category}</p>
+            <p><strong>Quantity:</strong> ${stockItem.quantity}</p>
+            <p><strong>Price:</strong> ${stockItem.price}</p>
+        `;
+        document.getElementById('stockDetailsPopup').style.display = 'flex';
+        currentStockIndex = index; // Set current index for editing
     }
 
-    // Employee Attendance Variables
-    const addEmployeeBtn = document.getElementById('addEmployeeBtn');
-    const employeePopup = document.getElementById('employeePopup');
-    const closeEmployeePopupBtn = document.getElementById('closeEmployeePopupBtn');
-    const employeeForm = document.getElementById('employeeForm');
-    const employeeName = document.getElementById('employeeName');
-    const attendanceDate = document.getElementById('attendanceDate');
-    const attendanceStatus = document.getElementById('attendanceStatus');
-    const attendanceTable = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
-    const warningMessageEmployee = document.getElementById('warningMessageEmployee');
+    // Edit stock functionality
+    editStockBtn.addEventListener('click', () => {
+        const stockItem = stockData[currentStockIndex];
+        document.getElementById('id').value = stockItem.productId;
+        document.getElementById('product').value = stockItem.product;
+        document.getElementById('brand').value = stockItem.brand;
+        document.getElementById('category').value = stockItem.category;
+        document.getElementById('quantity').value = stockItem.quantity;
+        document.getElementById('price').value = stockItem.price;
+        document.getElementById('popup').querySelector('h2').textContent = 'Edit Stock'; 
+                stockSubmitBtn.textContent = 'Edit Stock';
+        popup.style.display = 'flex'; // Show the stock popup
+        document.getElementById('stockDetailsPopup').style.display = 'none'; // Hide the details popup
+    });
 
-    // Open employee popup when clicking "Add New Employee"
+    // Close stock details popup
+const closeStockDetailsPopup = document.getElementById('closeStockDetailsPopup');
+closeStockDetailsPopup.addEventListener('click', () => {
+    document.getElementById('stockDetailsPopup').style.display = 'none'; // Hide the stock details popup
+});
+
+
+    // Delete stock functionality
+    deleteStockBtn.addEventListener('click', () => {
+        stockData.splice(currentStockIndex, 1); // Remove the stock item
+        document.getElementById('stockDetailsPopup').style.display = 'none'; // Hide the details popup
+        populateTable('stockTable', stockData, 'stock'); // Update the table
+    });
+
+    // Employee Management - Add Employee
     addEmployeeBtn.addEventListener('click', () => {
-        employeePopup.style.display = 'flex';
+        document.getElementById('employeePopup').querySelector('h2').textContent = 'Add Employee'; 
+        employeeSubmitBtn.textContent = 'Add Employee';
+        employeePopup.style.display = 'flex'; // Show the employee popup
+        employeeForm.reset(); // Reset the form
+        currentEmployeeIndex = null; // Reset the index for adding new employee
     });
 
-    // Close employee popup
+    // Close the employee popup
     closeEmployeePopupBtn.addEventListener('click', () => {
-        employeePopup.style.display = 'none';
+        employeePopup.style.display = 'none'; // Hide the employee popup
     });
 
-    // Handle the employee form submission
+    // Handle form submission for adding employee
     employeeForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Prevent the default form submission
+        e.preventDefault(); // Prevent form from refreshing the page
 
-        // Get the values from the form
-        const name = employeeName.value.trim();
-        const date = attendanceDate.value.trim();
-        const status = attendanceStatus.value;
+        // Get form values
+        const employeeId = document.getElementById('employeeId').value;
+        const employeeName = document.getElementById('employeeName').value;
+        const mobileNumber = document.getElementById('mobileNumber').value;
+        const joinDate = document.getElementById('joinDate').value;
 
-        // Validation for empty fields
-        if (!name || !date || !status) {
-            warningMessageEmployee.textContent = 'Please fill out all fields.';
-            warningMessageEmployee.style.display = 'block';
-            return;
+        // Create employee item object
+        const employeeItem = { employeeId, employeeName, mobileNumber, joinDate };
+
+        // If editing an existing employee
+        if (currentEmployeeIndex !== null) {
+            employeeData[currentEmployeeIndex] = employeeItem;
         } else {
-            warningMessageEmployee.style.display = 'none'; // Hide warning if all fields are valid
+            // Push new employee to employee data array
+            employeeData.push(employeeItem);
         }
 
-        // Create employee object
-        const newEmployee = { employeeName: name, date: date, status: status };
-
-        // Push employee data to the attendanceData array
-        attendanceData.push(newEmployee);
-
-        // Reset the form
+        // Clear form inputs
         employeeForm.reset();
 
-        // Close the popup
+        // Close the employee popup after adding/updating employee
         employeePopup.style.display = 'none';
 
-        // Populate employee table with updated data
-        populateTable('attendanceTable', attendanceData);
+        // Update the employee table
+        populateTable('attendanceTable', employeeData, 'employee');
     });
 
-    // Optional: Handle Delete button click in the table
-    attendanceTable.addEventListener('click', (e) => {
-        if (e.target && e.target.classList.contains('btn-danger')) {
-            const row = e.target.closest('tr');
-            row.remove(); // Remove the row from the table
-        }
+    // Populate employee attendance table
+    populateTable('attendanceTable', employeeData, 'employee');
+
+    // Show employee details in the popup
+    function showEmployeeDetails(index) {
+        const employeeItem = employeeData[index];
+        const employeeDetails = document.getElementById('employeeDetails');
+        employeeDetails.innerHTML = `
+            <p><strong>Employee ID:</strong> ${employeeItem.employeeId}</p>
+            <p><strong>Employee Name:</strong> ${employeeItem.employeeName}</p>
+            <p><strong>Mobile Number:</strong> ${employeeItem.mobileNumber}</p>
+            <p><strong>Join Date:</strong> ${employeeItem.joinDate}</p>
+        `;
+        document.getElementById('employeeDetailsPopup').style.display = 'flex';
+        currentEmployeeIndex = index; // Set current index for editing
+    }
+
+    // Edit employee functionality
+    editEmployeeBtn.addEventListener('click', () => {
+        const employeeItem = employeeData[currentEmployeeIndex];
+        document.getElementById('employeeId').value = employeeItem.employeeId;
+        document.getElementById('employeeName').value = employeeItem.employeeName;
+        document.getElementById('mobileNumber').value = employeeItem.mobileNumber;
+        document.getElementById('joinDate').value = employeeItem.joinDate;
+        document.getElementById('employeePopup').querySelector('h2').textContent = 'Edit Employee'; 
+                employeeSubmitBtn.textContent = 'Edit Employee';
+        employeePopup.style.display = 'flex'; // Show the employee popup
+        document.getElementById('employeeDetailsPopup').style.display = 'none'; // Hide the details popup
     });
+
+// Close employee details popup
+closeEmployeeDetailsPopup.addEventListener('click', () => {
+    document.getElementById('employeeDetailsPopup').style.display = 'none'; // Hide the employee details popup
+});
+
+
+    // Delete employee functionality
+    deleteEmployeeBtn.addEventListener('click', () => {
+        employeeData.splice(currentEmployeeIndex, 1); // Remove employee item
+        document.getElementById('employeeDetailsPopup').style.display = 'none'; // Hide the details popup
+        populateTable('attendanceTable', employeeData, 'employee'); // Update the table
+    });
+
 });
