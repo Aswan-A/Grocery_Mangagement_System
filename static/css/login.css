@@ -6,7 +6,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-image: url('grocery-storephoto.png'); 
+    background-image: url('../images/grocery-storephoto.png'); 
             background-size: cover; 
             background-repeat: no-repeat; 
             background-position: center center;        
