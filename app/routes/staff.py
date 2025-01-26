@@ -107,7 +107,7 @@ def delete_stock(product_id):
 def get_all_employees():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM employee")
+    cursor.execute("SELECT * FROM employees")
     employees = cursor.fetchall()
     cursor.close()
     connection.close()

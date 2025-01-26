@@ -2,6 +2,7 @@ from flask import Flask
 from app.routes import login, manager, staff
 import os
 from dotenv import load_dotenv
+from app.db import create_tables
 
 # Load environment variables
 load_dotenv()
@@ -19,5 +20,9 @@ def create_app():
     app.register_blueprint(login.bp)
     app.register_blueprint(manager.bp)
     app.register_blueprint(staff.staff_bp)
+
+    # Create tables and insert data before the first request
+    with app.app_context():
+        create_tables()
 
     return app
