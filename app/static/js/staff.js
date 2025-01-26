@@ -42,9 +42,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td>${stock.quantity}</td>
                         <td>${stock.price}</td>
                         <td>
-                            <button class="view-btn" data-id="${stock.productId}">View</button>
-                            <button class="edit-btn" data-id="${stock.productId}">Edit</button>
-                            <button class="delete-btn" data-id="${stock.productId}">Delete</button>
+                            <button class="view-btn" style="border-radius: 5px;" data-id="${stock.productId}">View</button>
+                            <button class="edit-btn" style="border-radius: 5px;" data-id="${stock.productId}">Edit</button>
+                            <button class="delete-btn" style="border-radius: 5px;" data-id="${stock.productId}">Delete</button>
                         </td>
                     `;
                 });
@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <button class="delete-btn" data-id="${employee.employeeId}">Delete</button>
                         </td>
                     `;
-                });
+                });         
             })
             .catch(err => console.error('Error loading employees:', err));
     }

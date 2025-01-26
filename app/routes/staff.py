@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, jsonify, current_app
+import datetime
+from flask import Blueprint, Response, json, render_template, request, jsonify
 from app.db import get_db_connection
 
 # Define Blueprint for staff routes
@@ -102,6 +103,12 @@ def delete_stock(product_id):
 
 # # --- Employee Management Routes ---
 
+def custom_serializer(obj):
+    if isinstance(obj, datetime.date):
+        return obj.strftime('%d-%m-%Y')  # Format as YYYY-MM-DD
+    raise TypeError("Type not serializable")
+
+
 # Fetch all employee data
 @staff_bp.route('/api/employee', methods=['GET'])
 def get_all_employees():
@@ -111,5 +118,6 @@ def get_all_employees():
     employees = cursor.fetchall()
     cursor.close()
     connection.close()
-    return jsonify(employees)
+    json_data = json.dumps(employees, default=custom_serializer)
+    return Response(json_data, mimetype='application/json')
 
