@@ -100,9 +100,11 @@
                             <th>Employee Name</th>
                             <th>Mobile Number</th>
                             <th>Join Date</th>
+                            <th>Date of Birth</th>
+                            <th>Address</th>
                             <th>Actions</th>
                         </tr>
-                    </thead>
+                    </thead>                    
                     <tbody>
                         <!-- Employee attendance rows will be added here via JavaScript -->
                     </tbody>
@@ -123,6 +125,14 @@
                                     <label for="employeeName" class="form-label">Employee Name:</label>
                                     <input type="text" id="employeeName" class="form-control" required>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="employeeDob" class="form-label">Date of Birth:</label>
+                                    <input type="date" id="employeeDob" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="employeeAddress" class="form-label">Address:</label>
+                                    <textarea id="employeeAddress" class="form-control" required></textarea>
+                                </div>                                
                                 <div class="mb-3">
                                     <label for="mobileNumber" class="form-label">Mobile Number:</label>
                                     <input type="text" id="mobileNumber" class="form-control" required>
