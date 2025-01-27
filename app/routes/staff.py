@@ -103,6 +103,67 @@ def delete_stock(product_id):
 
 # # --- Employee Management Routes ---
 
+# Endpoint to add a new employee
+@staff_bp.route('/api/employee', methods=['POST'])
+def add_employee():
+    try:
+        # Get data from request
+        data = request.get_json()
+        employee_id = data.get('employeeId')
+        employee_name = data.get('employeeName')
+        mobile_number = data.get('mobileNumber')
+        dob = data.get('DOB')
+        address = data.get('address')
+        join_date = data.get('joinDate')
+        
+        # Validate data
+        if not employee_id or not employee_name or not join_date:
+            return jsonify({"error": "Employee ID, Name, and Join Date are required"}), 400
+                
+        # Establish DB connection
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Insert new employee data into the database
+        cursor.execute('''INSERT INTO employees (employeeId, employeeName, mobileNumber, DOB, address, joinDate) 
+                          VALUES (%s, %s, %s, %s, %s, %s)''', 
+                          (employee_id, employee_name, mobile_number, dob, address, join_date))
+        connection.commit()
+        
+        cursor.close()
+        connection.close()
+        
+        return jsonify({
+            "message": "Employee added successfully!",
+            "employeeId": employee_id
+        }), 201
+
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Log the error to the console
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
+# Delete an employee by employeeId
+@staff_bp.route('/api/employee/<string:employee_id>', methods=['DELETE'])
+def delete_employee(employee_id):
+    try:
+        # Establish DB connection
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Delete the employee by employeeId
+        cursor.execute("DELETE FROM employees WHERE employeeId = %s", (employee_id,))
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        return jsonify({"message": "Employee deleted successfully!"})
+
+    except Exception as e:
+        return jsonify({"error": "Error deleting employee", "details": str(e)}), 500
+
+
+
 def custom_serializer(obj):
     if isinstance(obj, datetime.date):
         return obj.strftime('%d-%m-%Y')  # Format as YYYY-MM-DD

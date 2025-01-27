@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-
     // Search stocks
     stockSearchInput.addEventListener('input', function () {
         const query = stockSearchInput.value.toLowerCase();
@@ -218,15 +217,88 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td>${employee.DOB}</td>
                         <td>${employee.address}</td>
                         <td>
-                            <button class="view-btn" data-id="${employee.employeeId}">View</button>
-                            <button class="edit-btn" data-id="${employee.employeeId}">Edit</button>
-                            <button class="delete-btn" data-id="${employee.employeeId}">Delete</button>
+                            <button class="view-btn-emp" data-id="${employee.employeeId}">View</button>
+                            <button class="edit-btn-emp" data-id="${employee.employeeId}">Edit</button>
+                            <button class="delete-btn-emp" data-id="${employee.employeeId}">Delete</button>
                         </td>
                     `;
                 });         
             })
             .catch(err => console.error('Error loading employees:', err));
     }
+
+// Add new employee
+addEmployeeBtn.addEventListener('click', function () {
+    employeePopup.style.display = 'flex';
+});
+
+closeEmployeePopupBtn.addEventListener('click', function () {
+    employeePopup.style.display = 'none';
+});
+
+employeeForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const newEmployee = {
+        employeeId: document.getElementById('employeeId').value,
+        employeeName: document.getElementById('employeeName').value,
+        mobileNumber: document.getElementById('mobileNumber').value,
+        dob: document.getElementById('employeeDob').value,
+        address: document.getElementById('employeeAddress').value,
+        joinDate: document.getElementById('joinDate').value,
+    };
+
+    fetch('/staff/api/employee', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newEmployee),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Employee added:', data);
+            loadEmployees();
+            employeePopup.style.display = 'none';
+        })
+        .catch(err => console.error('Error adding employee:', err));
+});
+
+// Delete employee
+employeeTable.addEventListener('click', function (e) {
+    // Delete employee
+    if (e.target.classList.contains('delete-btn-emp')) {
+        const employeeId = e.target.getAttribute('data-id');
+        if (confirm('Are you sure you want to delete this employee?')) {
+            fetch(`/staff/api/employee/${employeeId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Employee deleted:', data);
+                    loadEmployees();  // Reload employee list after deletion
+                })
+                .catch(err => console.error('Error deleting employee:', err));
+        }
+    }
+});
+
+
+    const attendanceSearchInput = document.getElementById('attendanceSearch');
+
+    // Search employees
+    attendanceSearchInput.addEventListener('input', function () {
+        const query = attendanceSearchInput.value.toLowerCase();
+        const rows = employeeTable.getElementsByTagName('tr');
+        
+        Array.from(rows).forEach(row => {
+            const employeeName = row.cells[1].textContent.toLowerCase();
+            if (employeeName.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
 
 
     // Load employees and stocks on page load
