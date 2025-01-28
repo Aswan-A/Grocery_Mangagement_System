@@ -46,11 +46,18 @@ def create_tables():
                 joinDate DATE NOT NULL
             );
         """
-        
+        create_attendance_table = """
+            CREATE TABLE IF NOT EXISTS attendance (
+                employeeId VARCHAR(50) ,
+                Date date ,
+                status VARCHAR(15)
+            );
+            """ 
         # Execute the SQL queries to create tables
         cursor.execute(create_users_table)
         cursor.execute(create_stocks_table)
         cursor.execute(create_employees_table)
+        cursor.execute(create_attendance_table)
 
         # Insert default users into the 'users' table
         insert_users = """
