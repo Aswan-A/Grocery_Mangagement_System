@@ -309,13 +309,20 @@ const getAbsenteesBtn = document.getElementById('getAbsenteesBtn');
 const absenteesPopup = document.getElementById('absenteesPopup');
 const closeAbsenteesPopup = document.getElementById('closeAbsenteesPopup');
 const absenteesList = document.getElementById('absenteesList');
+
 // Function to open the absentees popup and populate the list by fetching data from the server
 function openAbsenteesPopup() {
     // Clear existing absentees list
     absenteesList.innerHTML = '';
-
+    const attenDate=document.getElementById('attendDate').value;
+    // console.log(attenDate);
     // Fetch absentee data from the server
-    fetch('/staff/api/get_absentees')
+    fetch(`/staff/api/get_absentees?date=${encodeURIComponent(attenDate)}`, {
+        method: 'GET',  // Use GET to fetch data
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
     .then(response => response.json())
         .then(absentees => {
             // Check if there are any absentees
@@ -338,6 +345,7 @@ function openAbsenteesPopup() {
 
     // Show the popup
     absenteesPopup.style.display = 'flex';
+    
 }
 
 // Event listener for Get Absentees button
@@ -353,16 +361,6 @@ window.addEventListener('click', function (event) {
     if (event.target === absenteesPopup) {
         absenteesPopup.style.display = 'none';
     }
-});
-
-
-
-// Event listener for Get Absentees button
-getAbsenteesBtn.addEventListener('click', openAbsenteesPopup);
-
-// Close the popup when the close button is clicked
-closeAbsenteesPopup.addEventListener('click', function () {
-    absenteesPopup.style.display = 'none';
 });
 
 // Optional: Close the popup when clicking outside of the popup content

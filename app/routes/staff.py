@@ -189,14 +189,19 @@ def get_all_employees():
 def get_absentees():
     connection = get_db_connection()
     cursor = connection.cursor()
+    date = request.args.get('date')     
+    # print(date)
     cursor.execute("""
-    SELECT e.employeeId, e.employeeName
-    FROM employees e
-    LEFT JOIN attendance a ON e.employeeId = a.employeeId AND a.Date = CURDATE()
-    WHERE a.Status is null;
-    """)
-
+        SELECT e.employeeId, e.employeeName
+        FROM employees e
+        LEFT JOIN attendance a ON e.employeeId = a.employeeId AND a.Date = %s
+        WHERE a.Status is null;
+    """,(date,))
+    
+    print("SDFSDFSDG") 
     absentees = cursor.fetchall()
+    print("SDFSDFSDGGGG")
+
     # Format the absentee data into a list of dictionaries
     absentee_list = [{'employeeId': absentee[0], 'employeeName': absentee[1]} for absentee in absentees]
     print(absentee_list)
