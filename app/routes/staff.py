@@ -1,4 +1,5 @@
 import datetime
+import sqlite3
 from flask import Blueprint, Response, json, render_template, request, jsonify
 from app.db import get_db_connection
 
@@ -182,3 +183,99 @@ def get_all_employees():
     json_data = json.dumps(employees, default=custom_serializer)
     return Response(json_data, mimetype='application/json')
 
+
+
+@staff_bp.route('/api/get_absentees', methods=['GET'])
+def get_absentees():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("""
+    SELECT e.employeeId, e.employeeName
+    FROM employees e
+    LEFT JOIN attendance a ON e.employeeId = a.employeeId AND a.Date = CURDATE()
+    WHERE a.Status is null;
+    """)
+
+    absentees = cursor.fetchall()
+    # Format the absentee data into a list of dictionaries
+    absentee_list = [{'employeeId': absentee[0], 'employeeName': absentee[1]} for absentee in absentees]
+    print(absentee_list)
+
+    connection.close()
+    return jsonify(absentee_list)
+
+@staff_bp.route('/api/mark_attendance', methods=['POST'])
+def mark_attendance():
+    data = request.get_json()  # Getting the data sent from the frontend
+    employee_id = data['employeeId']
+    date = data['date']
+    status = 'present'  # Default status, you can modify this if needed (e.g., for absent status)
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Check if the employee already has attendance for today
+    cursor.execute("""
+    SELECT * FROM attendance WHERE employeeId = %s AND Date = %s
+    """, (employee_id, date))
+    existing_attendance = cursor.fetchone()
+
+    if existing_attendance:
+        # If attendance already exists for today, return a response saying so
+        return jsonify({'success': False, 'message': 'Attendance already marked for today.'}), 400
+
+    # If attendance doesn't exist for today, insert the new record
+    cursor.execute("""
+    INSERT INTO attendance (employeeId, Date, Status)
+    VALUES (%s, %s, %s)
+    """, (employee_id, date, status))
+
+    connection.commit()
+    connection.close()
+
+    return jsonify({'success': True, 'message': 'Attendance marked successfully!'}), 200
+
+# --- Billing Management Routes ---
+
+# # Add a new bill
+# @staff_bp.route('/api/billing', methods=['POST'])
+# def add_bill():
+#     try:
+#         data = request.get_json()
+#         customer_name = data.get('customerName')
+#         items = data.get('items')  # List of items with productId and quantity
+#         total_amount = data.get('totalAmount')
+
+#         if not customer_name or not items or total_amount is None:
+#             return jsonify({"error": "Customer name, items, and total amount are required"}), 400
+
+#         connection = get_db_connection()
+#         cursor = connection.cursor()
+
+#         # Insert the bill into the billing table
+#         cursor.execute('''
+#             INSERT INTO billing (customerName, items, totalAmount)
+#             VALUES (%s, %s, %s)
+#         ''', (customer_name, json.dumps(items), total_amount))
+#         connection.commit()
+
+#         # Now subtract the billed quantity from the stock for each item
+#         for item in items:
+#             product_id = item['productId']
+#             billed_quantity = item['quantity']
+
+#             # Update the stock table to subtract the billed quantity
+#             cursor.execute('''
+#                 UPDATE stocks
+#                 SET quantity = quantity - %s
+#                 WHERE productId = %s AND quantity >= %s
+#             ''', (billed_quantity, product_id, billed_quantity))
+
+#         connection.commit()
+#         cursor.close()
+#         connection.close()
+
+#         return jsonify({"message": "Bill added and stock updated successfully!"}), 201
+
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500

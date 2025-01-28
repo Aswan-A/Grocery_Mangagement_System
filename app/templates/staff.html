@@ -17,6 +17,7 @@
                 <ul>
                     <li><a href="#stocks" id="stocksLink" class="active">Stock Management</a></li>
                     <li><a href="#attendance" id="attendanceLink">Employee Attendance</a></li>
+                    <li><a href="#billing" id="billingLink">Billing</a></li>
                 </ul>
             </nav>
         </aside>
@@ -84,6 +85,17 @@
             <!-- Employee Attendance Tab -->
             <section id="attendance" class="tab">
                 <h1>Employee Attendance</h1>
+                <!-- Get Absentees Button -->
+                <button id="getAbsenteesBtn" class="btn btn-warning" style="border-radius: 5px;">Get Absentees</button>
+                <div id="absenteesPopup" class="popup" style="display: none;">
+                    <div class="popup-content">
+                        <span id="closeAbsenteesPopup" class="close-btn">&times;</span>
+                        <h2>Absentees List</h2>
+                        <div id="absenteesList">
+                            <!-- List of absentees will be displayed here -->
+                        </div>
+                    </div>
+                </div>
                 <input type="text" id="attendanceSearch" placeholder="Search employee...">
                 <div class="attendance-actions">
                     <button id="addEmployeeBtn" style="border-radius: 5px;">Add New Employee</button>
@@ -93,9 +105,6 @@
                     </div>
                 </div>
 
-
-
-                <!-- Employee Attendance Table -->
                 <table id="attendanceTable">
                     <thead>
                         <tr>
@@ -113,7 +122,6 @@
                     </tbody>
                 </table>
 
-                <!-- Employee Popup for adding new employee -->
                 <div id="employeePopup" class="popup">
                     <div class="popup-content">
                         <span id="closeEmployeePopupBtn" class="close-btn">&times;</span>
@@ -144,14 +152,12 @@
                                     <label for="joinDate" class="form-label">Join Date:</label>
                                     <input type="date" id="joinDate" class="form-control" required>
                                 </div>
-                                <button type="submit" id="employeeSubmitBtn" class="btn btn-primary">Add
-                                    Employee</button>
+                                <button type="submit" id="employeeSubmitBtn" class="btn btn-primary">Add Employee</button>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- Employee Details Popup -->
                 <div id="employeeDetailsPopup" class="popup">
                     <div class="popup-content">
                         <span id="closeEmployeeDetailsPopup" class="close-btn">&times;</span>
@@ -161,7 +167,45 @@
                         <button id="deleteEmployeeBtn" class="btn btn-danger">Delete</button>
                     </div>
                 </div>
+
+                <!-- Add absentee popup for the "Get Absentees" button -->
+                <div id="absenteesPopup" class="popup">
+                    <div class="popup-content">
+                        <span id="closeAbsenteesPopup" class="close-btn">&times;</span>
+                        <h2>Absentees List</h2>
+                        <div id="absenteesList">
+                            <!-- List of absentees will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+
             </section>
+
+            <!-- Billing Tab -->
+            <!-- <section id="billing" class="tab">
+                <h1>Billing</h1>
+                <div class="billing-actions">
+                    <input type="text" id="billingSearch" placeholder="Search products for billing...">
+                    <button id="generateBillBtn" class="btn btn-primary">Generate Bill</button>
+                </div>
+                <table id="billingTable">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        Billing rows will be added via JavaScript
+                     </tbody>
+                </table>
+                <div class="billing-summary">
+                    <h3>Total Amount: <span id="totalAmount">0</span></h3>
+                </div>
+            </section>  -->
         </main>
     </div>
     <script src="{{ url_for('static', filename='js/staff.js') }}"></script>
