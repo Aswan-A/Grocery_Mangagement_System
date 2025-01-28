@@ -41,19 +41,11 @@ document.addEventListener('DOMContentLoaded', function () {
         { product: 'Cake', category: 'Bakery', quantity: 50, price: '$3.00' }
     ];
 
-    let attendanceData = [
-        { name: 'John Doe', date: '2025-01-02', status: 'Present' },
-        { name: 'Jane Smith', date: '2025-01-02', status: 'Absent' },
-        { name: 'Sam Johnson', date: '2025-01-01', status: 'Present' },
-        { name: 'Lisa White', date: '2025-01-01', status: 'Present' }
-    ];
-
     const salesData = [
         { date: '2025-01-01', sales: '$500.00', category: 'Groceries' }
     ];
 
     populateTable('stockTable', stockData);
-    populateTable('attendanceTable', attendanceData);
     populateTable('salesTable', salesData);
 
     // Filter Event Listeners
@@ -83,19 +75,30 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Function to populate the table with data
-    function populateTable(tableId, data) {
-        const tbody = document.getElementById(tableId).querySelector('tbody');
-        tbody.innerHTML = '';  // Clear existing rows
-        data.forEach(row => {
-            const tr = document.createElement('tr');
-            for (const key in row) {
-                const td = document.createElement('td');
-                td.textContent = row[key];
-                tr.appendChild(td);
-            }
-            tbody.appendChild(tr);
-        });
+    async function loadAttendanceData() {
+        try {
+            const response = await fetch('/manager/attendance');
+            const data = await response.json();
+
+            const tableBody = document.querySelector('#attendanceTable tbody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.employeeId}</td>
+                    <td>${new Date(row.Date).toLocaleDateString()}</td>
+                    <td>${row.status}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('Error loading attendance data:', error);
+        }
     }
+
+    // Load attendance data when the page loads
+    document.addEventListener('DOMContentLoaded', loadAttendanceData);
 
     // Manage visibility of filter sections based on the active tab
     function manageFilters(targetId) {
@@ -174,6 +177,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Populate the table with the final filtered and searched data
-        populateTable(tableId, filteredAndSearchedData);
+        loadAttendanceData(tableId, filteredAndSearchedData);
     }
 });
