@@ -304,4 +304,109 @@ employeeTable.addEventListener('click', function (e) {
     // Load employees and stocks on page load
     loadEmployees();
     loadStocks();
+// Get the button and popup
+const getAbsenteesBtn = document.getElementById('getAbsenteesBtn');
+const absenteesPopup = document.getElementById('absenteesPopup');
+const closeAbsenteesPopup = document.getElementById('closeAbsenteesPopup');
+const absenteesList = document.getElementById('absenteesList');
+
+// Function to open the absentees popup and populate the list by fetching data from the server
+function openAbsenteesPopup() {
+    // Clear existing absentees list
+    absenteesList.innerHTML = '';
+    const attenDate=document.getElementById('attendDate').value;
+    // console.log(attenDate);
+    // Fetch absentee data from the server
+    fetch(`/staff/api/get_absentees?date=${encodeURIComponent(attenDate)}`, {
+        method: 'GET',  // Use GET to fetch data
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+        .then(absentees => {
+            // Check if there are any absentees
+            if (absentees.length === 0) {
+                absenteesList.textContent = 'No absentees today.';
+                return;
+            }
+
+            // Add each absentee to the list
+            absentees.forEach(absentee => {
+                const absenteeItem = document.createElement('div');
+                absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
+                absenteesList.appendChild(absenteeItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching absentees:', error);
+            absenteesList.textContent = 'Failed to fetch absentee data.';
+        });
+
+    // Show the popup
+    absenteesPopup.style.display = 'flex';
+    
+}
+
+// Event listener for Get Absentees button
+getAbsenteesBtn.addEventListener('click', openAbsenteesPopup);
+
+// Close the popup when the close button is clicked
+closeAbsenteesPopup.addEventListener('click', function () {
+    absenteesPopup.style.display = 'none';
+});
+
+// Optional: Close the popup when clicking outside of the popup content
+window.addEventListener('click', function (event) {
+    if (event.target === absenteesPopup) {
+        absenteesPopup.style.display = 'none';
+    }
+});
+
+// Optional: Close the popup when clicking outside of the popup content
+window.addEventListener('click', function (event) {
+    if (event.target === absenteesPopup) {
+        absenteesPopup.style.display = 'none';
+    }
+});
+
+    // Get references to the input and button elements
+const attendanceIdInput = document.getElementById('attendanceId');
+const attendanceBtn = document.getElementById('attendanceBtn');
+
+// Event listener for the "Enter" button
+attendanceBtn.addEventListener('click', function () {
+    const employeeId = attendanceIdInput.value.trim();
+
+    if (employeeId === '') {
+        alert('Please enter a valid Employee ID');
+        return;
+    }
+
+    // Send the employee ID to the server to record the attendance
+    fetch('/staff/api/mark_attendance', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            employeeId: employeeId,
+            date: new Date().toISOString().split('T')[0]  // Send today's date in 'YYYY-MM-DD' format
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Attendance recorded successfully');
+        } else {
+            alert('Error recording attendance');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to record attendance');
+    });
+});
+
+
 });
