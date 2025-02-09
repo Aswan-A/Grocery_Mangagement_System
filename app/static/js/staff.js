@@ -222,65 +222,65 @@ document.addEventListener("DOMContentLoaded", function () {
                             <button class="delete-btn-emp" data-id="${employee.employeeId}">Delete</button>
                         </td>
                     `;
-                });         
+                });
             })
             .catch(err => console.error('Error loading employees:', err));
     }
 
-// Add new employee
-addEmployeeBtn.addEventListener('click', function () {
-    employeePopup.style.display = 'flex';
-});
+    // Add new employee
+    addEmployeeBtn.addEventListener('click', function () {
+        employeePopup.style.display = 'flex';
+    });
 
-closeEmployeePopupBtn.addEventListener('click', function () {
-    employeePopup.style.display = 'none';
-});
+    closeEmployeePopupBtn.addEventListener('click', function () {
+        employeePopup.style.display = 'none';
+    });
 
-employeeForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const newEmployee = {
-        employeeId: document.getElementById('employeeId').value,
-        employeeName: document.getElementById('employeeName').value,
-        mobileNumber: document.getElementById('mobileNumber').value,
-        dob: document.getElementById('employeeDob').value,
-        address: document.getElementById('employeeAddress').value,
-        joinDate: document.getElementById('joinDate').value,
-    };
+    employeeForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const newEmployee = {
+            employeeId: document.getElementById('employeeId').value,
+            employeeName: document.getElementById('employeeName').value,
+            mobileNumber: document.getElementById('mobileNumber').value,
+            dob: document.getElementById('employeeDob').value,
+            address: document.getElementById('employeeAddress').value,
+            joinDate: document.getElementById('joinDate').value,
+        };
 
-    fetch('/staff/api/employee', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newEmployee),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Employee added:', data);
-            loadEmployees();
-            employeePopup.style.display = 'none';
+        fetch('/staff/api/employee', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newEmployee),
         })
-        .catch(err => console.error('Error adding employee:', err));
-});
-
-// Delete employee
-employeeTable.addEventListener('click', function (e) {
-    // Delete employee
-    if (e.target.classList.contains('delete-btn-emp')) {
-        const employeeId = e.target.getAttribute('data-id');
-        if (confirm('Are you sure you want to delete this employee?')) {
-            fetch(`/staff/api/employee/${employeeId}`, {
-                method: 'DELETE',
+            .then(response => response.json())
+            .then(data => {
+                console.log('Employee added:', data);
+                loadEmployees();
+                employeePopup.style.display = 'none';
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Employee deleted:', data);
-                    loadEmployees();  // Reload employee list after deletion
+            .catch(err => console.error('Error adding employee:', err));
+    });
+
+    // Delete employee
+    employeeTable.addEventListener('click', function (e) {
+        // Delete employee
+        if (e.target.classList.contains('delete-btn-emp')) {
+            const employeeId = e.target.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this employee?')) {
+                fetch(`/staff/api/employee/${employeeId}`, {
+                    method: 'DELETE',
                 })
-                .catch(err => console.error('Error deleting employee:', err));
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Employee deleted:', data);
+                        loadEmployees();  // Reload employee list after deletion
+                    })
+                    .catch(err => console.error('Error deleting employee:', err));
+            }
         }
-    }
-});
+    });
 
 
     const attendanceSearchInput = document.getElementById('attendanceSearch');
@@ -289,7 +289,7 @@ employeeTable.addEventListener('click', function (e) {
     attendanceSearchInput.addEventListener('input', function () {
         const query = attendanceSearchInput.value.toLowerCase();
         const rows = employeeTable.getElementsByTagName('tr');
-        
+
         Array.from(rows).forEach(row => {
             const employeeName = row.cells[1].textContent.toLowerCase();
             if (employeeName.includes(query)) {
@@ -304,109 +304,265 @@ employeeTable.addEventListener('click', function (e) {
     // Load employees and stocks on page load
     loadEmployees();
     loadStocks();
-// Get the button and popup
-const getAbsenteesBtn = document.getElementById('getAbsenteesBtn');
-const absenteesPopup = document.getElementById('absenteesPopup');
-const closeAbsenteesPopup = document.getElementById('closeAbsenteesPopup');
-const absenteesList = document.getElementById('absenteesList');
+    // Get the button and popup
+    const getAbsenteesBtn = document.getElementById('getAbsenteesBtn');
+    const absenteesPopup = document.getElementById('absenteesPopup');
+    const closeAbsenteesPopup = document.getElementById('closeAbsenteesPopup');
+    const absenteesList = document.getElementById('absenteesList');
 
-// Function to open the absentees popup and populate the list by fetching data from the server
-function openAbsenteesPopup() {
-    // Clear existing absentees list
-    absenteesList.innerHTML = '';
-    const attenDate=document.getElementById('attendDate').value;
-    // console.log(attenDate);
-    // Fetch absentee data from the server
-    fetch(`/staff/api/get_absentees?date=${encodeURIComponent(attenDate)}`, {
-        method: 'GET',  // Use GET to fetch data
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-        .then(absentees => {
-            // Check if there are any absentees
-            if (absentees.length === 0) {
-                absenteesList.textContent = 'No absentees today.';
-                return;
+    // Function to open the absentees popup and populate the list by fetching data from the server
+    function openAbsenteesPopup() {
+        // Clear existing absentees list
+        absenteesList.innerHTML = '';
+        const attenDate = document.getElementById('attendDate').value;
+        // console.log(attenDate);
+        // Fetch absentee data from the server
+        fetch(`/staff/api/get_absentees?date=${encodeURIComponent(attenDate)}`, {
+            method: 'GET',  // Use GET to fetch data
+            headers: {
+                'Content-Type': 'application/json'
             }
-
-            // Add each absentee to the list
-            absentees.forEach(absentee => {
-                const absenteeItem = document.createElement('div');
-                absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
-                absenteesList.appendChild(absenteeItem);
-            });
         })
-        .catch(error => {
-            console.error('Error fetching absentees:', error);
-            absenteesList.textContent = 'Failed to fetch absentee data.';
-        });
+            .then(response => response.json())
+            .then(absentees => {
+                // Check if there are any absentees
+                if (absentees.length === 0) {
+                    absenteesList.textContent = 'No absentees today.';
+                    return;
+                }
 
-    // Show the popup
-    absenteesPopup.style.display = 'flex';
-    
-}
+                // Add each absentee to the list
+                absentees.forEach(absentee => {
+                    const absenteeItem = document.createElement('div');
+                    absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
+                    absenteesList.appendChild(absenteeItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching absentees:', error);
+                absenteesList.textContent = 'Failed to fetch absentee data.';
+            });
 
-// Event listener for Get Absentees button
-getAbsenteesBtn.addEventListener('click', openAbsenteesPopup);
+        // Show the popup
+        absenteesPopup.style.display = 'flex';
 
-// Close the popup when the close button is clicked
-closeAbsenteesPopup.addEventListener('click', function () {
-    absenteesPopup.style.display = 'none';
-});
-
-// Optional: Close the popup when clicking outside of the popup content
-window.addEventListener('click', function (event) {
-    if (event.target === absenteesPopup) {
-        absenteesPopup.style.display = 'none';
     }
-});
 
-// Optional: Close the popup when clicking outside of the popup content
-window.addEventListener('click', function (event) {
-    if (event.target === absenteesPopup) {
+    // Event listener for Get Absentees button
+    getAbsenteesBtn.addEventListener('click', openAbsenteesPopup);
+
+    // Close the popup when the close button is clicked
+    closeAbsenteesPopup.addEventListener('click', function () {
         absenteesPopup.style.display = 'none';
-    }
-});
+    });
+
+    // Optional: Close the popup when clicking outside of the popup content
+    window.addEventListener('click', function (event) {
+        if (event.target === absenteesPopup) {
+            absenteesPopup.style.display = 'none';
+        }
+    });
+
+    // Optional: Close the popup when clicking outside of the popup content
+    window.addEventListener('click', function (event) {
+        if (event.target === absenteesPopup) {
+            absenteesPopup.style.display = 'none';
+        }
+    });
 
     // Get references to the input and button elements
-const attendanceIdInput = document.getElementById('attendanceId');
-const attendanceBtn = document.getElementById('attendanceBtn');
+    const attendanceIdInput = document.getElementById('attendanceId');
+    const attendanceBtn = document.getElementById('attendanceBtn');
 
-// Event listener for the "Enter" button
-attendanceBtn.addEventListener('click', function () {
-    const employeeId = attendanceIdInput.value.trim();
+    // Event listener for the "Enter" button
+    attendanceBtn.addEventListener('click', function () {
+        const employeeId = attendanceIdInput.value.trim();
 
-    if (employeeId === '') {
-        alert('Please enter a valid Employee ID');
-        return;
+        if (employeeId === '') {
+            alert('Please enter a valid Employee ID');
+            return;
+        }
+
+        // Send the employee ID to the server to record the attendance
+        fetch('/staff/api/mark_attendance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                employeeId: employeeId,
+                date: new Date().toISOString().split('T')[0]  // Send today's date in 'YYYY-MM-DD' format
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Attendance recorded successfully');
+                } else {
+                    alert('Error recording attendance');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to record attendance');
+            });
+    });
+
+
+    let billItems = [];
+    document.getElementById("billingSearch").value = "";
+
+    // Function to handle the search action
+    function searchProduct() {
+        const productId = document.getElementById("billingSearch").value.trim();
+        if (!productId) return;
+
+        fetch(`/staff/api/stock/${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Product not found.");
+                } else if (data.quantity <= 0) {
+                    alert("Out of stock.");
+                } else {
+                    addProductToBill(data);
+                }
+            })
+            .catch(error => {
+                alert("An error occurred while searching for the product.");
+            });
+
+        document.getElementById("billingSearch").value = "";
     }
 
-    // Send the employee ID to the server to record the attendance
-    fetch('/staff/api/mark_attendance', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            employeeId: employeeId,
-            date: new Date().toISOString().split('T')[0]  // Send today's date in 'YYYY-MM-DD' format
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Attendance recorded successfully');
-        } else {
-            alert('Error recording attendance');
+    document.getElementById("billingSearchBtn").addEventListener("click", searchProduct);
+    document.getElementById("billingSearch").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchProduct();
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to record attendance');
     });
-});
+
+    // Add product to bill or update existing product's quantity
+    function addProductToBill(product) {
+        const availableQuantity = product.quantity;
+
+        document.getElementById("billingSearch").value = "";
+
+        const existingProductIndex = billItems.findIndex(item => item.productId === product.productId);
+
+        if (existingProductIndex !== -1) {
+            const existingProduct = billItems[existingProductIndex];
+            let quantity = prompt(`Enter quantity for this product (Available quantity: ${availableQuantity})`, existingProduct.quantity);
+
+            while (quantity && (quantity <= 0 || quantity > availableQuantity)) {
+                if (quantity > availableQuantity) {
+                    alert(`Invalid quantity. Available quantity: ${availableQuantity}`);
+                }
+                quantity = prompt(`Enter quantity for this product (Available quantity: ${availableQuantity})`, existingProduct.quantity);
+            }
+
+            if (quantity && quantity > 0) {
+                existingProduct.quantity = parseInt(quantity);
+                existingProduct.total = existingProduct.price * existingProduct.quantity;
+                updateBillTable();
+            }
+        } else {
+            let quantity = prompt(`Enter quantity for this product (Available quantity: ${availableQuantity})`, 1);
+
+            while (quantity && (quantity <= 0 || quantity > availableQuantity)) {
+                if (quantity > availableQuantity) {
+                    alert(`Invalid quantity. Available quantity: ${availableQuantity}`);
+                }
+                quantity = prompt(`Enter quantity for this product (Available quantity: ${availableQuantity})`, 1);
+            }
+
+            if (quantity && quantity > 0) {
+                const total = product.price * quantity;
+                billItems.push({
+                    productId: product.productId,
+                    productName: product.productName,
+                    price: product.price,
+                    quantity: parseInt(quantity),
+                    total: total
+                });
+                updateBillTable();
+            }
+        }
+    }
+
+    // Update the billing table with items
+    function updateBillTable() {
+        const tableBody = document.querySelector("#billingTable tbody");
+        tableBody.innerHTML = '';
+
+        let totalAmount = 0;
+
+        billItems.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.productId}</td>
+                <td>${item.productName}</td>
+                <td>${item.price}</td>
+                <td>${item.quantity}</td>
+                <td>${item.total}</td>
+                <td><button class="remove-btn" data-product-id="${item.productId}">Remove</button></td>
+            `;
+            tableBody.appendChild(row);
+            totalAmount += item.total;
+        });
+
+        document.getElementById("totalAmount").innerText = totalAmount.toFixed(2);
+
+        document.querySelectorAll(".remove-btn").forEach(button => {
+            button.addEventListener('click', removeProductFromBill);
+        });
+    }
+
+    // Remove product from bill
+    function removeProductFromBill(event) {
+        const productId = event.target.getAttribute('data-product-id');
+        const productIndex = billItems.findIndex(item => item.productId === productId);
+
+        if (productIndex !== -1) {
+            billItems.splice(productIndex, 1);
+            updateBillTable();
+        }
+    }
+
+    // Event listener for generating the bill
+    document.getElementById('generateBillBtn').addEventListener('click', generateBill);
+
+    // Generate bill
+    function generateBill() {
+        if (billItems.length === 0) {
+            alert("No items in the bill.");
+            return;
+        }
+
+        const billData = { items: billItems };
+
+        fetch('/staff/api/billing/generate_bill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(billData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(`Bill generated successfully! Total: ₹${data.totalAmount}`);
+                    billItems = [];
+                    updateBillTable();
+                }
+            })
+            .catch(error => {
+                console.error("Error generating bill:", error);
+                alert("An error occurred while generating the bill.");
+            });
+    }
+
 
 
 });

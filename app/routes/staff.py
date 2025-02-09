@@ -240,47 +240,108 @@ def mark_attendance():
 
     return jsonify({'success': True, 'message': 'Attendance marked successfully!'}), 200
 
-# --- Billing Management Routes ---
 
-# # Add a new bill
-# @staff_bp.route('/api/billing', methods=['POST'])
-# def add_bill():
-#     try:
-#         data = request.get_json()
-#         customer_name = data.get('customerName')
-#         items = data.get('items')  # List of items with productId and quantity
-#         total_amount = data.get('totalAmount')
+# Fetch product details by productId (for billing section)
+@staff_bp.route('/api/billing/stock/<string:product_id>', methods=['GET'])
+def get_product_for_billing(product_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT productId, productName, price, quantity FROM stocks WHERE productId = %s", (product_id,))
+    product = cursor.fetchone()  # Fetch one product by productId
+    
+    cursor.close()
+    connection.close()
+    
+    if product:
+        return jsonify(product)
+    else:
+        return jsonify({"error": "Product not found"}), 404
 
-#         if not customer_name or not items or total_amount is None:
-#             return jsonify({"error": "Customer name, items, and total amount are required"}), 400
 
-#         connection = get_db_connection()
-#         cursor = connection.cursor()
+# Update stock quantity after the billing operation
+@staff_bp.route('/api/billing/update_quantity', methods=['POST'])
+def update_stock_quantity_after_billing():
+    data = request.get_json()
+    product_id = data['productId']
+    quantity_sold = data['quantitySold']
+    
+    # Validate if the quantity is greater than zero
+    if quantity_sold <= 0:
+        return jsonify({"error": "Quantity sold must be greater than zero."}), 400
+    
+    # Check if enough stock is available
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT quantity FROM stocks WHERE productId = %s", (product_id,))
+    current_stock = cursor.fetchone()
+    
+    if not current_stock:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "Product not found."}), 404
+    
+    if current_stock['quantity'] < quantity_sold:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "Not enough stock available."}), 400
 
-#         # Insert the bill into the billing table
-#         cursor.execute('''
-#             INSERT INTO billing (customerName, items, totalAmount)
-#             VALUES (%s, %s, %s)
-#         ''', (customer_name, json.dumps(items), total_amount))
-#         connection.commit()
+    # Update the stock quantity in the database
+    new_quantity = current_stock['quantity'] - quantity_sold
+    cursor.execute("UPDATE stocks SET quantity = %s WHERE productId = %s", (new_quantity, product_id))
+    connection.commit()
+    
+    cursor.close()
+    connection.close()
+    
+    return jsonify({"message": "Stock quantity updated successfully!"}), 200
 
-#         # Now subtract the billed quantity from the stock for each item
-#         for item in items:
-#             product_id = item['productId']
-#             billed_quantity = item['quantity']
 
-#             # Update the stock table to subtract the billed quantity
-#             cursor.execute('''
-#                 UPDATE stocks
-#                 SET quantity = quantity - %s
-#                 WHERE productId = %s AND quantity >= %s
-#             ''', (billed_quantity, product_id, billed_quantity))
+# Generate the bill after adding products
+@staff_bp.route('/api/billing/generate_bill', methods=['POST'])
+def generate_bill():
+    try:
+        data = request.get_json()  # Get the billing data
+        items = data['items']  # Extract items from the request data
+        total_amount = 0  # Initialize total amount
 
-#         connection.commit()
-#         cursor.close()
-#         connection.close()
+        # Loop through each item in the bill
+        for item in items:
+            product_id = item['productId']
+            quantity_billed = int(item['quantity'])
+            price = float(item['price'])
 
-#         return jsonify({"message": "Bill added and stock updated successfully!"}), 201
+            # Fetch the current stock for the product from the database
+            connection = get_db_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT quantity FROM stocks WHERE productId = %s", (product_id,))
+            stock = cursor.fetchone()
+            
+            if stock is None:
+                return jsonify({"error": f"Product with ID {product_id} not found in stock."}), 404
+            
+            current_quantity = stock['quantity']
+            
+            # Check if there's enough stock for the requested quantity
+            if current_quantity < quantity_billed:
+                return jsonify({"error": f"Not enough stock for product {product_id}. Available: {current_quantity}, Requested: {quantity_billed}."}), 400
 
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+            # Reduce the stock in the database
+            new_quantity = current_quantity - quantity_billed
+            cursor.execute("""
+                UPDATE stocks 
+                SET quantity = %s 
+                WHERE productId = %s
+            """, (new_quantity, product_id))
+            connection.commit()
+
+            cursor.close()
+
+            # Update total amount
+            total_amount += price * quantity_billed
+
+        # Optionally, you can add code here to store the generated bill in a "bills" table or something similar.
+        
+        return jsonify({"success": True, "totalAmount": total_amount}), 200
+
+    except Exception as e:
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500

@@ -4,14 +4,17 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 .popup {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dark background */
-    display: none; /* Hidden by default */
+    background: rgba(0, 0, 0, 0.5);
+    /* Dark background */
+    display: none;
+    /* Hidden by default */
     justify-content: center;
     align-items: center;
     z-index: 9999;
@@ -35,8 +38,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dark background */
-    display: none; /* Hidden by default */
+    background: rgba(0, 0, 0, 0.5);
+    /* Dark background */
+    display: none;
+    /* Hidden by default */
     justify-content: center;
     align-items: center;
     z-index: 9999;
@@ -80,12 +85,14 @@ form button {
 form button:hover {
     background-color: #2980b9;
 }
+
 /* Body and Common Styles */
 body {
     font-family: 'Poppins', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #8e44ad, #3498db); /* Violet to Blue Gradient */
+    background: linear-gradient(135deg, #8e44ad, #3498db);
+    /* Violet to Blue Gradient */
     color: rgb(0, 0, 0);
 }
 
@@ -95,21 +102,27 @@ body {
     height: 100vh;
     transition: all 0.5s ease;
 }
+
 .close-btn {
-    
-    position: absolute;  /* Absolute positioning */
-    top: 10px;           /* Distance from the top of the parent */
-    right: 10px;         /* Distance from the right of the parent */
+
+    position: absolute;
+    /* Absolute positioning */
+    top: 10px;
+    /* Distance from the top of the parent */
+    right: 10px;
+    /* Distance from the right of the parent */
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
     color: #34495e;
-    z-index: 100;        /* Make sure it appears on top of other elements */
+    z-index: 100;
+    /* Make sure it appears on top of other elements */
 }
 
 /* Hover effect for close button */
 .close-btn:hover {
-    color: #e74c3c; /* Red color when hovered */
+    color: #e74c3c;
+    /* Red color when hovered */
 }
 
 
@@ -217,7 +230,8 @@ table {
     overflow: hidden;
 }
 
-table th, table td {
+table th,
+table td {
     text-align: left;
     padding: 15px;
     border-bottom: 1px solid #ddd;
@@ -252,23 +266,25 @@ input[type="text"]:focus {
 }
 
 /* Stock and Attendance Actions */
-.stock-actions, .attendance-actions {
+.stock-actions,
+.attendance-actions {
     margin-top: 20px;
-    display: flex; 
-    justify-content: space-between; 
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    border-radius:5px;
+    border-radius: 5px;
 }
 
 #attendanceBtn {
-    border-radius:5px;
-    padding: 5px 10px; 
-    font-size: 15px; 
-    line-height: 2;}
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 15px;
+    line-height: 2;
+}
 
-.attendance-container{
-    display: flex; 
-    align-items: center; 
+.attendance-container {
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
@@ -278,6 +294,105 @@ input[type="text"]:focus {
     display: inline-block;
     margin-right: 15px;
 }
+
+#attendance button {
+    border-radius: 5px;
+}
+
+
+/* Billing Section */
+#billing {
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+#billing button {
+    border-radius: 5px;
+}
+
+.billing-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-radius: 15px;
+}
+
+.search-billing {
+    display: flex;
+    align-items: center;
+    width: 50%;
+}
+
+#billingSearch {
+    width: 80%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+#billingSearchBtn {
+    font-size: 18px;
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    margin-left: 10px;
+}
+
+#billingSearchBtn:hover {
+    background-color: #2980b9;
+}
+
+
+/* Billing Summary */
+.billing-summary {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.billing-summary span {
+    font-size: 29px;
+    color: #e74c3c;
+    margin-left: 10px;
+}
+
+/* Generate Bill Button */
+.generate-bill {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#generateBillBtn {
+    font-size: 18px;
+    padding: 12px 20px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+#generateBillBtn:hover {
+    background-color: #27ae60;
+}
+
 
 
 /* Responsive Design */
@@ -294,5 +409,34 @@ input[type="text"]:focus {
 
     .content {
         padding: 20px;
+    }
+
+    #billing {
+        padding: 15px;
+    }
+
+    .billing-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-billing {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #billingSearch {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .generate-bill {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .billing-summary {
+        width: 100%;
+        justify-content: flex-start;
     }
 }
