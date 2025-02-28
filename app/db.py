@@ -53,12 +53,23 @@ def create_tables():
                 status VARCHAR(15)
             );
             """ 
+        
+        create_sales_table = """
+            CREATE TABLE IF NOT EXISTS sales (
+                id INT AUTO_INCREMENT PRIMARY KEY,  -- Unique identifier for each sale
+                productId VARCHAR(50) NOT NULL,
+                Date DATE NOT NULL,
+                quantity INT NOT NULL,
+                FOREIGN KEY (productId) REFERENCES stocks(productId) ON DELETE CASCADE
+                );
+            """ 
+
         # Execute the SQL queries to create tables
         cursor.execute(create_users_table)
         cursor.execute(create_stocks_table)
         cursor.execute(create_employees_table)
         cursor.execute(create_attendance_table)
-
+        cursor.execute(create_sales_table)
         # Insert default users into the 'users' table
         insert_users = """
             INSERT IGNORE INTO users (username, password, role)

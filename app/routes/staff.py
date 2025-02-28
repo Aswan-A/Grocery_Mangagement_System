@@ -332,14 +332,29 @@ def generate_bill():
                 SET quantity = %s 
                 WHERE productId = %s
             """, (new_quantity, product_id))
+
+            cursor.execute("Select id, quantity from sales where productId = %s and Date = CURDATE()",(product_id,))
+            record=cursor.fetchone()
+            if (record):
+                nquantity=quantity_billed+record['quantity']
+                cursor.execute("""
+                UPDATE sales SET  quantity =%s where id=%s 
+                """, (nquantity, record['id']))
+            else:
+                cursor.execute("""
+                INSERT INTO sales (productId, Date, quantity)
+                VALUES (%s, CURDATE(), %s)
+                """, (product_id, quantity_billed))
+                
+
             connection.commit()
 
             cursor.close()
-
+            connection.close()
             # Update total amount
             total_amount += price * quantity_billed
 
-        # Optionally, you can add code here to store the generated bill in a "bills" table or something similar.
+
         
         return jsonify({"success": True, "totalAmount": total_amount}), 200
 
