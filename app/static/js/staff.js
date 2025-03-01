@@ -610,7 +610,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document
   .getElementById("getTopSellingItemsBtn")
   .addEventListener("click", function () {
-    const selectedDate = document.getElementById("salesDate2").value;
+    const selectedDate = document.getElementById("salesDate").value;
 
     if (!selectedDate) {
       alert("Please select a date.");

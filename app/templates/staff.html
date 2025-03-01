@@ -29,13 +29,13 @@
                 <input type="text" id="stockSearch" placeholder="Search stocks...">
                 <div class="stock-actions">
                     <button id="addStockBtn" style="border-radius: 5px;">Add New Stock</button>
-                    <div class="sales-summary">
                         <input type="date" id="salesDate">
                         <button id="getTotalSalesBtn" class="btn btn-info">Get Total Sales</button>
-                        <h3>Total Sales on Selected Date: <span id="salesAmount">0</span></h3>
-                    </div>
+                         <span id="salesAmount">0</span>
+                        <button id="getTopSellingItemsBtn">Get Top Selling Items</button>
+                        <ul id="topSellingItems"></ul>
 
-                    
+
                     <div id="popup" class="popup">
                         <div class="popup-content">
                             <span id="closePopupBtn" class="close-btn">&times;</span>
@@ -87,10 +87,8 @@
                         <button id="deleteStockBtn" class="btn btn-danger">Delete</button>
                     </div>
                 </div>
-                <input type="date" id="salesDate2" />
-                <button id="getTopSellingItemsBtn">Get Top Selling Items</button>
-                <ul id="topSellingItems"></ul>
-                
+
+
             </section>
 
             <!-- Employee Attendance Tab -->
@@ -227,7 +225,7 @@
                     <h3>Total Amount: <span id="totalAmount">0</span></h3>
                 </div>
 
-           
+
 
                 <!-- Generate Bill Button -->
                 <div class="generate-bill">
