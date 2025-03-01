@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" >
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -29,6 +29,13 @@
                 <input type="text" id="stockSearch" placeholder="Search stocks...">
                 <div class="stock-actions">
                     <button id="addStockBtn" style="border-radius: 5px;">Add New Stock</button>
+                    <div class="sales-summary">
+                        <input type="date" id="salesDate">
+                        <button id="getTotalSalesBtn" class="btn btn-info">Get Total Sales</button>
+                        <h3>Total Sales on Selected Date: <span id="salesAmount">0</span></h3>
+                    </div>
+
+                    
                     <div id="popup" class="popup">
                         <div class="popup-content">
                             <span id="closePopupBtn" class="close-btn">&times;</span>
@@ -80,7 +87,10 @@
                         <button id="deleteStockBtn" class="btn btn-danger">Delete</button>
                     </div>
                 </div>
-
+                <input type="date" id="salesDate2" />
+                <button id="getTopSellingItemsBtn">Get Top Selling Items</button>
+                <ul id="topSellingItems"></ul>
+                
             </section>
 
             <!-- Employee Attendance Tab -->
@@ -185,6 +195,8 @@
             </section>
 
             <!-- Billing Tab -->
+
+            <!-- Billing Tab -->
             <section id="billing" class="tab">
                 <h1>Billing</h1>
 
@@ -214,6 +226,8 @@
                 <div class="billing-summary">
                     <h3>Total Amount: <span id="totalAmount">0</span></h3>
                 </div>
+
+           
 
                 <!-- Generate Bill Button -->
                 <div class="generate-bill">
