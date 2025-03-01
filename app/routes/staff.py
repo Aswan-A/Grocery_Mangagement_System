@@ -1,5 +1,4 @@
-from datetime import datetime
-import sqlite3
+from datetime import datetime , date
 from flask import Blueprint, Response, json, render_template, request, jsonify
 import mysql
 from app.db import get_db_connection
@@ -165,13 +164,6 @@ def delete_employee(employee_id):
         return jsonify({"error": "Error deleting employee", "details": str(e)}), 500
 
 
-
-def custom_serializer(obj):
-    if isinstance(obj, datetime.date):
-        return obj.strftime('%d-%m-%Y')  # Format as YYYY-MM-DD
-    raise TypeError("Type not serializable")
-
-
 # Fetch all employee data
 @staff_bp.route('/api/employee', methods=['GET'])
 def get_all_employees():
@@ -181,8 +173,12 @@ def get_all_employees():
     employees = cursor.fetchall()
     cursor.close()
     connection.close()
-    json_data = json.dumps(employees, default=custom_serializer)
-    return Response(json_data, mimetype='application/json')
+     # Convert datetime fields to "DDMMYYYY" format
+    for emp in employees:
+        for key, value in emp.items():
+            if isinstance(value,( datetime,date)):  # Check if it's a date object
+                emp[key] = value.strftime('%d-%m-%Y')  # Convert to "DD-MM-YYYY"
+    return jsonify(employees)
 
 
 
@@ -198,14 +194,11 @@ def get_absentees():
         LEFT JOIN attendance a ON e.employeeId = a.employeeId AND a.Date = %s
         WHERE a.Status is null;
     """,(date,))
-    
-    print("SDFSDFSDG") 
+     
     absentees = cursor.fetchall()
-    print("SDFSDFSDGGGG")
 
     # Format the absentee data into a list of dictionaries
     absentee_list = [{'employeeId': absentee[0], 'employeeName': absentee[1]} for absentee in absentees]
-    print(absentee_list)
 
     connection.close()
     return jsonify(absentee_list)
@@ -380,7 +373,7 @@ def get_total_sales():
 
     try:
         cursor = connection.cursor(dictionary=True)
-        # Calculate total sales amount instead of quantity
+        # Calculate total sales amount
         query = """
             SELECT SUM(s.quantity * p.price) AS total_sales_amount
             FROM sales s
@@ -390,7 +383,6 @@ def get_total_sales():
         cursor.execute(query, (date,))
         result = cursor.fetchone()
         total_sales_amount = result["total_sales_amount"] if result["total_sales_amount"] is not None else 0.0
-        print(result["total_sales_amount"])
         return jsonify({"date": date, "total_sales_amount": f"{total_sales_amount:.2f}"})
 
     except mysql.connector.Error as err:
