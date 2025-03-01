@@ -634,6 +634,37 @@ document.addEventListener("DOMContentLoaded", function () {
       );
   });
 
+  document.getElementById('getTotalSalesBtn').addEventListener('click', function () {
+    document.getElementById('totalSalesModal').style.display = 'block';
+});
+
+document.getElementById('getTopSellingItemsBtn').addEventListener('click', function () {
+    document.getElementById('topSellingModal').style.display = 'block';
+});
+
+// Function to close modal
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".close").forEach(function (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+          this.closest(".modal, .popup").style.display = "none";
+      });
+  });
+});
+
+
+// Close modal when clicking outside content
+window.onclick = function (event) {
+    let modals = document.querySelectorAll('.modal');
+    modals.forEach((modal) => {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+};
 
   
 });

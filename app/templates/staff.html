@@ -29,12 +29,29 @@
                 <input type="text" id="stockSearch" placeholder="Search stocks...">
                 <div class="stock-actions">
                     <button id="addStockBtn" style="border-radius: 5px;">Add New Stock</button>
-                        <input type="date" id="salesDate">
-                        <button id="getTotalSalesBtn" class="btn btn-info">Get Total Sales</button>
-                         <span id="salesAmount">0</span>
-                        <button id="getTopSellingItemsBtn">Get Top Selling Items</button>
-                        <ul id="topSellingItems"></ul>
+                <div>
 
+                    <input type="date" id="salesDate">
+                    <button id="getTotalSalesBtn" class="btn btn-info">Get Total Sales</button>
+                    <button id="getTopSellingItemsBtn" class="btn btn-info">Get Top Selling Items</button>
+                    
+                    <!-- Modal for Total Sales -->
+                    <div id="totalSalesModal" class="modal">
+                        <div class="modal-content">
+                            <h2>Total Sales</h2>
+                            <p>Sales on selected date: <strong id="salesAmount">0</strong></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal for Top Selling Items -->
+                    <div id="topSellingModal" class="modal">
+                        <div class="modal-content">
+                            <h2>Top Selling Items</h2>
+                            <ul id="topSellingItems"></ul>
+                        </div>
+                    </div>
+                    
+                </div>
 
                     <div id="popup" class="popup">
                         <div class="popup-content">
