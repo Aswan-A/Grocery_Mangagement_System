@@ -37,7 +37,7 @@ def create_tables():
             );
         """
         create_employees_table = """
-            CREATE TABLE IF NOT EXISTS employees (
+            CREATE TemployeesABLE IF NOT EXISTS employees (
                 employeeId VARCHAR(50) PRIMARY KEY,
                 employeeName VARCHAR(255) NOT NULL,
                 mobileNumber BIGINT,
