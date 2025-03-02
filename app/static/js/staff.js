@@ -624,6 +624,7 @@ document.addEventListener("DOMContentLoaded", function () {
           alert(`Bill generated successfully! Total: ₹${data.totalAmount}`);
           billItems = [];
           updateBillTable();
+          loadStocks()
         }
       })
       .catch((error) => {

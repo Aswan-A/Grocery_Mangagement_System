@@ -1,7 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, json, render_template, jsonify, request
 import mysql.connector
-from app.db import get_db_connection  # Ensure this is correctly set up
+from app.routes.login import get_db_connection
+
 
 # Create a Blueprint for manager-related routes
 bp = Blueprint('manager', __name__, url_prefix='/manager')

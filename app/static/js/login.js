@@ -4,11 +4,12 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const message = document.getElementById('message');
-    
+    const supermarket = document.getElementById('supermarket').value;
     // Prepare data to send to the Flask backend
     const data = {
         username: username,
-        password: password
+        password: password,
+        supermarket:supermarket
     };
     
     // Use the Fetch API to send the login data to the Flask backend
