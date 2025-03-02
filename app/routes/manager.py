@@ -15,7 +15,7 @@ def get_all_attendance():
     cursor = connection.cursor(dictionary=True)
     
     # ✅ Ensure the date format is 'YYYY-MM-DD' for JavaScript compatibility
-    cursor.execute("SELECT employeeId, DATE_FORMAT(date, '%Y-%m-%d') AS formatted_date, status FROM attendance")
+    cursor.execute("SELECT employeeId, DATE_FORMAT(date, '%Y-%m-%d') AS formatted_date, status FROM attendance order by formatted_date desc")
     attendance = cursor.fetchall()
     
     cursor.close()

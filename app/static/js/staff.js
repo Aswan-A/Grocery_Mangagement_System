@@ -666,5 +666,7 @@ window.onclick = function (event) {
     });
 };
 
-  
+let today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD
+    document.getElementById("salesDate").setAttribute("max", today);
+    document.getElementById("attendDate").setAttribute("max", today);
 });
