@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const stockFilter = document.getElementById('stockFilter');
     const attendanceFilter = document.getElementById('attendanceFilter');
     const salesFilter = document.getElementById('salesFilter');
+    const attendanceSearch = document.getElementById('attendanceSearch');
+    const dateFilter = document.getElementById('dateFilter');
 
     // Initially hide all filter sections
     stockFilter.style.display = 'none';
@@ -33,72 +35,61 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Example data for populating tables
-    let stockData = [
-        { product: 'Apples', category: 'Fruits', quantity: 150, price: '$1.00' },
-        { product: 'Bread', category: 'Bakery', quantity: 80, price: '$2.50' },
-        { product: 'Bananas', category: 'Fruits', quantity: 120, price: '$0.60' },
-        { product: 'Cake', category: 'Bakery', quantity: 50, price: '$3.00' }
-    ];
+    // Load attendance data when the page loads
+    loadAttendanceData();
 
-    const salesData = [
-        { date: '2025-01-01', sales: '$500.00', category: 'Groceries' }
-    ];
+    // Function to populate a table with fetched data
+    function populateTable(tableId, data) {
+        const tableBody = document.querySelector(`#${tableId} tbody`);
+        if (!tableBody) {
+            console.error(`Table with ID '${tableId}' not found.`);
+            return;
+        }
+        tableBody.innerHTML = ''; // Clear existing rows
 
-    populateTable('stockTable', stockData);
-    populateTable('salesTable', salesData);
+        data.forEach(row => {
+            let formattedDate = "Invalid Date"; // Default fallback
 
-    // Filter Event Listeners
-    document.getElementById('categoryFilter').addEventListener('change', function() {
-        applyFiltersAndSearch();
-    });
+            if (row.date) {  
+                let parsedDate = Date.parse(row.date);
+                if (!isNaN(parsedDate)) {
+                    let dateObj = new Date(parsedDate);
+                    let day = String(dateObj.getDate()).padStart(2, '0');
+                    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let year = String(dateObj.getFullYear()).slice(-2);
+                    formattedDate = `${day}/${month}/${year}`; // Convert to dd/mm/yy format
+                } else {
+                    console.error("Invalid date format received:", row.date);
+                }
+            }
 
-    document.getElementById('dateFilter').addEventListener('change', function() {
-        applyFiltersAndSearch();
-    });
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.employeeId}</td>
+                <td>${formattedDate}</td>
+                <td>${row.status}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
 
-    document.getElementById('salesDateFilter').addEventListener('change', function() {
-        applyFiltersAndSearch();
-    });
-
-    // Search Event Listeners
-    document.getElementById('stockSearch').addEventListener('input', function() {
-        applyFiltersAndSearch();
-    });
-
-    document.getElementById('attendanceSearch').addEventListener('input', function() {
-        applyFiltersAndSearch();
-    });
-
-    document.getElementById('salesSearch').addEventListener('input', function() {
-        applyFiltersAndSearch();
-    });
-
-    // Function to populate the table with data
+    // Function to fetch and load attendance data
     async function loadAttendanceData() {
         try {
-            const response = await fetch('/manager/attendance');
+            console.log("Fetching attendance data...");
+            const response = await fetch('/manager/api/attendance');
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
             const data = await response.json();
+            console.log("Attendance Data:", data);
 
-            const tableBody = document.querySelector('#attendanceTable tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
+            populateTable('attendanceTable', data);
 
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.employeeId}</td>
-                    <td>${new Date(row.Date).toLocaleDateString()}</td>
-                    <td>${row.status}</td>
-                `;
-                tableBody.appendChild(tr);
-            });
         } catch (error) {
             console.error('Error loading attendance data:', error);
         }
     }
-
-    // Load attendance data when the page loads
-    document.addEventListener('DOMContentLoaded', loadAttendanceData);
 
     // Manage visibility of filter sections based on the active tab
     function manageFilters(targetId) {
@@ -121,62 +112,57 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('stockSearch').value = '';
         } else if (targetId === 'attendance') {
             document.getElementById('attendanceSearch').value = '';
+            document.getElementById('dateFilter').value = '';
+            filterAttendanceTable();
         } else if (targetId === 'sales') {
             document.getElementById('salesSearch').value = '';
         }
     }
 
-    // Apply filters and search together
-    function applyFiltersAndSearch() {
-        const activeTab = document.querySelector('.tab.active').id;
+    // Function to filter attendance table based on search input
+    function filterAttendanceTable() {
+        const searchValue = attendanceSearch.value.toLowerCase();
+        const rows = document.querySelectorAll('#attendanceTable tbody tr');
 
-        let filteredData;
-        if (activeTab === 'stocks') {
-            filteredData = filterStocks(stockData);
-            searchAndPopulateTable('stockTable', filteredData);
-        } else if (activeTab === 'attendance') {
-            filteredData = filterAttendance(attendanceData);
-            searchAndPopulateTable('attendanceTable', filteredData);
-        } else if (activeTab === 'sales') {
-            filteredData = filterSales(salesData);
-            searchAndPopulateTable('salesTable', filteredData);
+        rows.forEach(row => {
+            const employeeId = row.cells[0].textContent.toLowerCase();
+            const date = row.cells[1].textContent.toLowerCase();
+            const status = row.cells[2].textContent.toLowerCase();
+
+            if (employeeId.includes(searchValue) || date.includes(searchValue) || status.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Function to filter attendance table by selected date
+    function filterAttendanceByDate() {
+        const selectedDate = dateFilter.value; // Format: YYYY-MM-DD
+        const rows = document.querySelectorAll('#attendanceTable tbody tr');
+
+        if (!selectedDate) {
+            rows.forEach(row => (row.style.display = '')); // Show all rows if input is empty
+            return;
         }
-    }
 
-    // Filter function for Stocks
-    function filterStocks(data) {
-        const categoryFilter = document.getElementById('categoryFilter').value;
-        return data.filter(stock => {
-            return categoryFilter === '' || stock.category === categoryFilter;
+        // Convert selectedDate (YYYY-MM-DD) to dd/mm/yy format
+        const dateParts = selectedDate.split('-'); // [YYYY, MM, DD]
+        const formattedSelectedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0].slice(-2)}`; // Convert to dd/mm/yy
+
+        rows.forEach(row => {
+            const rowDate = row.cells[1].textContent.trim(); // Date from table in dd/mm/yy format
+
+            if (rowDate === formattedSelectedDate) {
+                row.style.display = ''; // Show row if date matches
+            } else {
+                row.style.display = 'none'; // Hide non-matching rows
+            }
         });
     }
 
-    // Filter function for Attendance
-    function filterAttendance(data) {
-        const dateFilter = document.getElementById('dateFilter').value;
-        return data.filter(attendance => {
-            return dateFilter === '' || attendance.date === dateFilter;
-        });
-    }
-
-    // Filter function for Sales
-    function filterSales(data) {
-        const salesDateFilter = document.getElementById('salesDateFilter').value;
-        return data.filter(sale => {
-            return salesDateFilter === '' || sale.date === salesDateFilter;
-        });
-    }
-
-    // Search function and populate filtered data to table
-    function searchAndPopulateTable(tableId, data) {
-        const searchTerm = document.getElementById(tableId.replace('Table', 'Search')).value.toLowerCase();
-
-        // Perform search on filtered data
-        const filteredAndSearchedData = data.filter(item => {
-            return Object.values(item).some(value => value.toString().toLowerCase().includes(searchTerm));
-        });
-
-        // Populate the table with the final filtered and searched data
-        loadAttendanceData(tableId, filteredAndSearchedData);
-    }
+    // Attach event listeners to search and date input
+    attendanceSearch.addEventListener('input', filterAttendanceTable);
+    dateFilter.addEventListener('input', filterAttendanceByDate);
 });
