@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.tab');
     const links = document.querySelectorAll('.sidebar a');
-    
+
     const stockFilter = document.getElementById('stockFilter');
     const attendanceFilter = document.getElementById('attendanceFilter');
     const salesFilter = document.getElementById('salesFilter');
-    
+
     const attendanceSearch = document.getElementById('attendanceSearch');
     const dateFilter = document.getElementById('dateFilter');
 
@@ -55,6 +55,11 @@ document.addEventListener('DOMContentLoaded', function () {
             resetSearchInput(tabId);
         });
     });
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        window.location.href = "/"; // Redirects to login.html
+    });
+
 
     // ✅ Load attendance data on page load
     loadAttendanceData();
@@ -173,25 +178,25 @@ document.addEventListener('DOMContentLoaded', function () {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         })
-        .then(response => response.json())
-        .then(absentees => {
-            absenteesList.innerHTML = ""; 
+            .then(response => response.json())
+            .then(absentees => {
+                absenteesList.innerHTML = "";
 
-            if (absentees.length === 0) {
-                absenteesList.textContent = "No absentees today.";
-                return;
-            }
+                if (absentees.length === 0) {
+                    absenteesList.textContent = "No absentees today.";
+                    return;
+                }
 
-            absentees.forEach(absentee => {
-                const absenteeItem = document.createElement("div");
-                absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
-                absenteesList.appendChild(absenteeItem);
+                absentees.forEach(absentee => {
+                    const absenteeItem = document.createElement("div");
+                    absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
+                    absenteesList.appendChild(absenteeItem);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching absentees:", error);
+                absenteesList.textContent = "Failed to fetch absentee data.";
             });
-        })
-        .catch(error => {
-            console.error("Error fetching absentees:", error);
-            absenteesList.textContent = "Failed to fetch absentee data.";
-        });
 
         if (absenteesPopup) absenteesPopup.style.display = "flex";
     }
