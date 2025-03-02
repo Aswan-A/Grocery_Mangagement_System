@@ -10,7 +10,8 @@ body {
     font-family: 'Poppins', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #8e44ad, #3498db); /* Violet to Blue Gradient */
+    background: linear-gradient(135deg, #8e44ad, #3498db);
+    /* Violet to Blue Gradient */
     color: rgb(0, 0, 0);
 }
 
@@ -20,11 +21,28 @@ body {
     height: 100vh;
     transition: all 0.5s ease;
 }
+
+#logoutBtn {
+    float: right;
+    background-color: red;
+    color: white;
+    margin-top: -20px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#logoutBtn:hover {
+    background-color: darkred;
+}
+
 /* Dropdown Styles */
 #categoryFilter {
     padding: 12px 15px;
     width: 100%;
-    max-width: 250px; /* Limit width */
+    max-width: 250px;
+    /* Limit width */
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #fff;
@@ -127,6 +145,7 @@ body {
     font-weight: 600;
     color: #34495e;
 }
+
 .filters {
     margin-top: 20px;
     background-color: #263545;
@@ -150,13 +169,15 @@ body {
     display: block;
 }
 
-.filters select, .filters input {
+.filters select,
+.filters input {
     padding: 10px;
     width: 90%;
     margin-top: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 /* Tabs */
 .tab {
     display: none;
@@ -199,7 +220,8 @@ table {
     overflow: hidden;
 }
 
-table th, table td {
+table th,
+table td {
     text-align: left;
     padding: 15px;
     border-bottom: 1px solid #ddd;
@@ -238,7 +260,8 @@ input[type="text"]:focus {
 }
 
 /* Stock and Attendance Actions */
-.stock-actions, .attendance-actions {
+.stock-actions,
+.attendance-actions {
     margin-top: 20px;
 }
 
@@ -324,5 +347,5 @@ input[type="text"]:focus {
     .content {
         padding: 20px;
     }
-    
+
 }

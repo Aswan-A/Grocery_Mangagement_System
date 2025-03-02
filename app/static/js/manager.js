@@ -1,13 +1,13 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const tabs = document.querySelectorAll(".tab");
-  const links = document.querySelectorAll(".sidebar a");
-
-  const stockFilter = document.getElementById("stockFilter");
-  const attendanceFilter = document.getElementById("attendanceFilter");
-  const salesFilter = document.getElementById("salesFilter");
-
-  const attendanceSearch = document.getElementById("attendanceSearch");
-  const dateFilter = document.getElementById("dateFilter");
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.tab');
+    const links = document.querySelectorAll('.sidebar a');
+    
+    const stockFilter = document.getElementById('stockFilter');
+    const attendanceFilter = document.getElementById('attendanceFilter');
+    const salesFilter = document.getElementById('salesFilter');
+    
+    const attendanceSearch = document.getElementById('attendanceSearch');
+    const dateFilter = document.getElementById('dateFilter');
 
   // Absentee List Elements
   const getAbsenteesBtn = document.getElementById("getAbsenteesBtn");
@@ -51,10 +51,10 @@ document.addEventListener("DOMContentLoaded", function () {
       targetTab.classList.add("active");
       link.classList.add("active");
 
-      manageFilters(tabId);
-      resetSearchInput(tabId);
+            manageFilters(tabId);
+            resetSearchInput(tabId);
+        });
     });
-  });
 
   // ✅ Load attendance data on page load
   loadAttendanceData();
@@ -176,29 +176,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
     absenteesList.innerHTML = "Loading absentees...";
 
-    fetch(`/staff/api/get_absentees?date=${encodeURIComponent(selectedDate)}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => response.json())
-      .then((absentees) => {
-        absenteesList.innerHTML = "";
+        fetch(`/staff/api/get_absentees?date=${encodeURIComponent(selectedDate)}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+        .then(response => response.json())
+        .then(absentees => {
+            absenteesList.innerHTML = ""; 
 
-        if (absentees.length === 0) {
-          absenteesList.textContent = "No absentees today.";
-          return;
-        }
+            if (absentees.length === 0) {
+                absenteesList.textContent = "No absentees today.";
+                return;
+            }
 
-        absentees.forEach((absentee) => {
-          const absenteeItem = document.createElement("div");
-          absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
-          absenteesList.appendChild(absenteeItem);
+            absentees.forEach(absentee => {
+                const absenteeItem = document.createElement("div");
+                absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
+                absenteesList.appendChild(absenteeItem);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching absentees:", error);
+            absenteesList.textContent = "Failed to fetch absentee data.";
         });
-      })
-      .catch((error) => {
-        console.error("Error fetching absentees:", error);
-        absenteesList.textContent = "Failed to fetch absentee data.";
-      });
 
     if (absenteesPopup) absenteesPopup.style.display = "flex";
   }

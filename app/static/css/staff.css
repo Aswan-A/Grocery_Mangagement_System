@@ -20,6 +20,21 @@
     z-index: 9999;
 }
 
+#logoutBtn {
+    float: right;
+    background-color: red;
+    color: white;
+    margin-top: -20px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#logoutBtn:hover {
+    background-color: darkred;
+}
+
 /* Popup Content */
 .popup-content {
     position: relative;

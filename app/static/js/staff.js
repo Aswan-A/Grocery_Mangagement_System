@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+  document.getElementById("logoutBtn").addEventListener("click", function() {
+    window.location.href = "/"; // Redirects to login.html
+});
+
+
   // Handle stock actions
   const stockTable = document
     .getElementById("stockTable")
