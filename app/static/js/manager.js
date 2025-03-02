@@ -9,6 +9,50 @@ document.addEventListener('DOMContentLoaded', function () {
   const attendanceSearch = document.getElementById('attendanceSearch');
   const dateFilter = document.getElementById('dateFilter');
 
+
+  loadStocks();
+
+  function loadStocks() {
+    fetch("/manager/api/stock")
+      .then((response) => response.json())
+      .then((stocks) => {
+        populateStocksTable(stocks);
+      })
+      .catch((err) => console.error("Error loading stocks:", err));
+    document.getElementById("stockSearch").value = "";
+  }
+  
+  // ✅ Populate Stocks Table
+  function populateStocksTable(stocks) {
+    const tableBody = document.querySelector("#stockTable tbody");
+    if (!tableBody) {
+      console.error("Stock table not found.");
+      return;
+    }
+    tableBody.innerHTML = ""; // Clear previous data
+  
+    stocks.forEach((stock) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${stock.productName}</td>
+        <td>${stock.category}</td>
+        <td>${stock.quantity}</td>
+        <td>${stock.price}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
   // Absentee List Elements
   const getAbsenteesBtn = document.getElementById("getAbsenteesBtn");
   const absenteesPopup = document.getElementById("absenteesPopup");
@@ -366,4 +410,68 @@ document.addEventListener('DOMContentLoaded', function () {
       outOfStockModal.style.display = "none";
     }
   });
+
+
+
+
+
+
+
+
+
+
+
+  // ✅ Load sales data on page load
+loadSalesData();
+
+// ✅ Function to populate the sales table with fetched data
+function populateSalesTable(sales) {
+    const tableBody = document.querySelector("#salesTable tbody");
+    if (!tableBody) {
+      console.error("Sales table not found.");
+      return;
+    }
+    tableBody.innerHTML = ""; // Clear previous data
+  
+    sales.forEach((sale) => {
+      let formattedDate = "Invalid Date";
+      if (sale.Date) {  // Change from sale.date to sale.Date
+        let parsedDate = Date.parse(sale.Date);
+        if (!isNaN(parsedDate)) {
+          let dateObj = new Date(parsedDate);
+          formattedDate = dateObj.toLocaleDateString("en-GB"); // Convert to dd/mm/yyyy format
+        } else {
+          console.error("Invalid date format received:", sale.Date);
+        }
+      }
+  
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${formattedDate}</td>
+        <td>${sale.quantity}</td> <!-- Use quantity instead of totalSales -->
+        <td>${sale.productId}</td> <!-- Use productId instead of category -->
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+  
+
+// ✅ Fetch and load sales data
+async function loadSalesData() {
+  try {
+    console.log("Fetching sales data...");
+    const response = await fetch("/manager/api/sales");
+
+    if (!response.ok)
+      throw new Error(`HTTP error! Status: ${response.status}`);
+
+    const data = await response.json();
+    console.log("Sales Data:", data);
+
+    populateSalesTable(data);
+  } catch (error) {
+    console.error("Error loading sales data:", error);
+  }
+}
+
 });

@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, json, render_template, jsonify, request
 import mysql.connector
 from app.db import get_db_connection  # Ensure this is correctly set up
 
@@ -10,6 +10,26 @@ bp = Blueprint('manager', __name__, url_prefix='/manager')
 def manager_dashboard():
     return render_template('manager.html')
 
+@bp.route('/api/sales', methods=['GET'])
+def get_all_sales():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT `Date`,quantity,productId FROM sales")
+    stocks = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    print(json.dumps(stocks, indent=4))  # Converts to readable JSON format
+    return jsonify(stocks)
+
+@bp.route('/api/stock', methods=['GET'])
+def get_all_stocks():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM stocks")
+    stocks = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(stocks)
 # ✅ Route to get all attendance records
 @bp.route('/api/attendance', methods=['GET'])
 def get_all_attendance():
