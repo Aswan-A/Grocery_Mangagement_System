@@ -264,6 +264,11 @@ input[type="text"]:focus {
     border-color: #3498db;
     box-shadow: 0 0 6px rgba(52, 152, 219, 0.6);
 }
+input[type="number"]:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 6px rgba(52, 152, 219, 0.6);
+}
 
 /* Stock and Attendance Actions */
 .stock-actions,
@@ -392,6 +397,22 @@ input[type="text"]:focus {
 #generateBillBtn:hover {
     background-color: #27ae60;
 }
+
+#addstckbtn{
+    border-radius: 5px !important;
+}
+.addstck {
+    padding: 10px !important;
+    border: 2px solid #3498db !important;
+    border-radius: 5px !important;
+    font-size: 16px !important;
+    margin: 5px !important;
+    width: 120px !important;
+    height:fit-content;
+    outline: none;
+
+}
+
 
 #salesDate {
     padding: 10px;

@@ -70,11 +70,52 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+
+  document.getElementById("addstckbtn").addEventListener("click", async function () {
+    let productId = document.getElementById("addstckId").value.trim();
+    let quantity = document.getElementById("addstckQuan").value.trim();
+
+    if (!productId || !quantity) {
+      alert("⚠️ Please fill in both Product ID and Quantity.");
+      return;
+    }
+
+    let data = {
+      productId: productId,
+      quantity: parseInt(quantity)
+    };
+
+    try {
+      let response = await fetch(`api/add_stock`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      // Handle non-JSON responses
+      let result = await response.json();
+
+      if (response.ok) {
+        alert(`✅ Success: ${result.message}`);
+        loadStocks();
+        addstckId.value = "";
+        addstckQuan.value = "";
+      } else {
+        alert(`❌ Error: ${result.error || "Something went wrong."}`);
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      alert("❌ A network error occurred. Please try again.");
+    }
+  });
+
   // Add new stock
   addStockBtn.addEventListener("click", function () {
     document.getElementById("popup").querySelector("h2").textContent =
-      "Add Stock";
-    stockSubmitBtn.textContent = "Add Stock";
+      "Add Item";
+    stockSubmitBtn.textContent = "Add Item";
     stockForm.reset();
     document.getElementById("formMode").value = "add"; // Set mode to "add"
     popup.style.display = "flex";
@@ -165,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (formMode === "add") {
       // Add new stock
-      fetch("api/stock", {
+      fetch("api/item", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -586,87 +627,87 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document
-  .getElementById("getTotalSalesBtn")
-  .addEventListener("click", function () {
-    const selectedDate = document.getElementById("salesDate").value;
+    .getElementById("getTotalSalesBtn")
+    .addEventListener("click", function () {
+      const selectedDate = document.getElementById("salesDate").value;
 
-    if (!selectedDate) {
-      alert("Please select a date.");
-      return;
-    }
+      if (!selectedDate) {
+        alert("Please select a date.");
+        return;
+      }
 
-    fetch(`/staff/get_total_sales?date=${selectedDate}`)
-      .then((response) => response.json())
-      .then((data) => {
-        document.getElementById("salesAmount").innerText =
-          data.total_sales_amount || "0.00";
-      })
-      .catch((error) =>
-        console.error("Error fetching total sales amount:", error)
-      );
-  });
+      fetch(`/staff/get_total_sales?date=${selectedDate}`)
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("salesAmount").innerText =
+            data.total_sales_amount || "0.00";
+        })
+        .catch((error) =>
+          console.error("Error fetching total sales amount:", error)
+        );
+    });
 
 
   document
-  .getElementById("getTopSellingItemsBtn")
-  .addEventListener("click", function () {
-    const selectedDate = document.getElementById("salesDate").value;
+    .getElementById("getTopSellingItemsBtn")
+    .addEventListener("click", function () {
+      const selectedDate = document.getElementById("salesDate").value;
 
-    if (!selectedDate) {
-      alert("Please select a date.");
-      return;
-    }
+      if (!selectedDate) {
+        alert("Please select a date.");
+        return;
+      }
 
-    fetch(`/staff/get_top_selling_items?date=${selectedDate}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const itemList = document.getElementById("topSellingItems");
-        itemList.innerHTML = ""; // Clear previous data
+      fetch(`/staff/get_top_selling_items?date=${selectedDate}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const itemList = document.getElementById("topSellingItems");
+          itemList.innerHTML = ""; // Clear previous data
 
-        data.top_selling_items.forEach((item, index) => {
-          const listItem = document.createElement("li");
-          listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity} sold`;
-          itemList.appendChild(listItem);
-        });
-      })
-      .catch((error) =>
-        console.error("Error fetching top-selling items:", error)
-      );
-  });
+          data.top_selling_items.forEach((item, index) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity} sold`;
+            itemList.appendChild(listItem);
+          });
+        })
+        .catch((error) =>
+          console.error("Error fetching top-selling items:", error)
+        );
+    });
 
   document.getElementById('getTotalSalesBtn').addEventListener('click', function () {
     document.getElementById('totalSalesModal').style.display = 'block';
-});
-
-document.getElementById('getTopSellingItemsBtn').addEventListener('click', function () {
-    document.getElementById('topSellingModal').style.display = 'block';
-});
-
-// Function to close modal
-function closeModal(modalId) {
-  document.getElementById(modalId).style.display = "none";
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".close").forEach(function (closeBtn) {
-      closeBtn.addEventListener("click", function () {
-          this.closest(".modal, .popup").style.display = "none";
-      });
   });
-});
+
+  document.getElementById('getTopSellingItemsBtn').addEventListener('click', function () {
+    document.getElementById('topSellingModal').style.display = 'block';
+  });
+
+  // Function to close modal
+  function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".close").forEach(function (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        this.closest(".modal, .popup").style.display = "none";
+      });
+    });
+  });
 
 
-// Close modal when clicking outside content
-window.onclick = function (event) {
+  // Close modal when clicking outside content
+  window.onclick = function (event) {
     let modals = document.querySelectorAll('.modal');
     modals.forEach((modal) => {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
     });
-};
+  };
 
-let today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD
-    document.getElementById("salesDate").setAttribute("max", today);
-    document.getElementById("attendDate").setAttribute("max", today);
+  let today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD
+  document.getElementById("salesDate").setAttribute("max", today);
+  document.getElementById("attendDate").setAttribute("max", today);
 });

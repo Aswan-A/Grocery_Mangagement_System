@@ -24,9 +24,44 @@ def get_all_stocks():
     connection.close()
     return jsonify(stocks)
 
-# Add new stock item
-@staff_bp.route('api/stock', methods=['POST'])
+@staff_bp.route('api/add_stock', methods=['POST'])
 def add_stock():
+    try:
+        data = request.get_json()
+        product_id = data.get("productId")
+        quantity = data.get("quantity")
+
+        if not product_id or not quantity:
+            return jsonify({"success": False, "error": "Missing product ID or quantity"}), 400
+
+        # Connect to the database
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Check if the product exists
+        cursor.execute("SELECT quantity FROM stocks WHERE productId = %s", (product_id,))
+        product = cursor.fetchone()
+
+        if not product:
+            return jsonify({"success": False, "error": "Product ID not found"}), 404
+
+        # Update quantity by adding the new stock
+        new_quantity = product["quantity"] + quantity
+        cursor.execute("UPDATE stocks SET quantity = %s WHERE productId = %s", (new_quantity, product_id))
+        connection.commit()
+
+        # Close DB connection
+        cursor.close()
+        connection.close()
+
+        return jsonify({"success": True, "message": f"Stock updated! New quantity: {new_quantity}"}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# Add new item
+@staff_bp.route('api/item', methods=['POST'])
+def add_item():
     data = request.get_json()
     product_id = data['productId']
     product_name = data['product']
