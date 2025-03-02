@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.tab');
-    const links = document.querySelectorAll('.sidebar a');
-    
-    const stockFilter = document.getElementById('stockFilter');
-    const attendanceFilter = document.getElementById('attendanceFilter');
-    const salesFilter = document.getElementById('salesFilter');
-    
-    const attendanceSearch = document.getElementById('attendanceSearch');
-    const dateFilter = document.getElementById('dateFilter');
+  const tabs = document.querySelectorAll('.tab');
+  const links = document.querySelectorAll('.sidebar a');
+
+  const stockFilter = document.getElementById('stockFilter');
+  const attendanceFilter = document.getElementById('attendanceFilter');
+  const salesFilter = document.getElementById('salesFilter');
+
+  const attendanceSearch = document.getElementById('attendanceSearch');
+  const dateFilter = document.getElementById('dateFilter');
 
   // Absentee List Elements
   const getAbsenteesBtn = document.getElementById("getAbsenteesBtn");
@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const closeAbsenteesPopup = document.getElementById("closeAbsenteesPopup");
   const absenteesList = document.getElementById("absenteesList");
   const attendDateInput = document.getElementById("attendDate");
+
+  document.getElementById("logoutBtn").addEventListener("click", function () {
+    window.location.href = "/"; // Redirects to login.html
+  });
+
 
   // Initially hide all filter sections
   if (stockFilter) stockFilter.style.display = "none";
@@ -51,10 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
       targetTab.classList.add("active");
       link.classList.add("active");
 
-            manageFilters(tabId);
-            resetSearchInput(tabId);
-        });
+      manageFilters(tabId);
+      resetSearchInput(tabId);
     });
+  });
 
   // ✅ Load attendance data on page load
   loadAttendanceData();
@@ -153,9 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       row.style.display =
         employeeId.includes(searchValue) ||
-        employeeName.includes(searchValue) ||
-        date.includes(searchValue) ||
-        status.includes(searchValue)
+          employeeName.includes(searchValue) ||
+          date.includes(searchValue) ||
+          status.includes(searchValue)
           ? ""
           : "none";
     });
@@ -176,29 +181,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     absenteesList.innerHTML = "Loading absentees...";
 
-        fetch(`/staff/api/get_absentees?date=${encodeURIComponent(selectedDate)}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        })
-        .then(response => response.json())
-        .then(absentees => {
-            absenteesList.innerHTML = ""; 
+    fetch(`/staff/api/get_absentees?date=${encodeURIComponent(selectedDate)}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(response => response.json())
+      .then(absentees => {
+        absenteesList.innerHTML = "";
 
-            if (absentees.length === 0) {
-                absenteesList.textContent = "No absentees today.";
-                return;
-            }
+        if (absentees.length === 0) {
+          absenteesList.textContent = "No absentees today.";
+          return;
+        }
 
-            absentees.forEach(absentee => {
-                const absenteeItem = document.createElement("div");
-                absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
-                absenteesList.appendChild(absenteeItem);
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching absentees:", error);
-            absenteesList.textContent = "Failed to fetch absentee data.";
+        absentees.forEach(absentee => {
+          const absenteeItem = document.createElement("div");
+          absenteeItem.textContent = `ID: ${absentee.employeeId} - Name: ${absentee.employeeName}`;
+          absenteesList.appendChild(absenteeItem);
         });
+      })
+      .catch(error => {
+        console.error("Error fetching absentees:", error);
+        absenteesList.textContent = "Failed to fetch absentee data.";
+      });
 
     if (absenteesPopup) absenteesPopup.style.display = "flex";
   }
@@ -253,9 +258,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
           data.top_selling_items.forEach((item, index) => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${index + 1}. ${item.productName} - ${
-              item.total_quantity
-            } sold`;
+            listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity
+              } sold`;
             itemList.appendChild(listItem);
           });
         })
@@ -343,23 +347,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   const outOfStockModal = document.getElementById("outofstockModal");
-const openOutOfStockBtn = document.getElementById("checkOutOfStockBtn");
-const closeOutOfStockBtn = document.getElementById("closeOutOfStock");
+  const openOutOfStockBtn = document.getElementById("checkOutOfStockBtn");
+  const closeOutOfStockBtn = document.getElementById("closeOutOfStock");
 
-// Open modal when button is clicked
-openOutOfStockBtn.addEventListener("click", () => {
+  // Open modal when button is clicked
+  openOutOfStockBtn.addEventListener("click", () => {
     outOfStockModal.style.display = "block";
-});
+  });
 
-// Close modal when (X) button is clicked
-closeOutOfStockBtn.addEventListener("click", () => {
+  // Close modal when (X) button is clicked
+  closeOutOfStockBtn.addEventListener("click", () => {
     outOfStockModal.style.display = "none";
-});
+  });
 
-// Close modal when clicking outside the modal content
-window.addEventListener("click", (event) => {
+  // Close modal when clicking outside the modal content
+  window.addEventListener("click", (event) => {
     if (event.target === outOfStockModal) {
-        outOfStockModal.style.display = "none";
+      outOfStockModal.style.display = "none";
     }
-});
+  });
 });

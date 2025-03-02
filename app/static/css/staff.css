@@ -279,6 +279,7 @@ input[type="text"]:focus {
     border-color: #3498db;
     box-shadow: 0 0 6px rgba(52, 152, 219, 0.6);
 }
+
 input[type="number"]:focus {
     outline: none;
     border-color: #3498db;
@@ -413,9 +414,10 @@ input[type="number"]:focus {
     background-color: #27ae60;
 }
 
-#addstckbtn{
+#addstckbtn {
     border-radius: 5px !important;
 }
+
 .addstck {
     padding: 10px !important;
     border: 2px solid #3498db !important;
@@ -423,7 +425,7 @@ input[type="number"]:focus {
     font-size: 16px !important;
     margin: 5px !important;
     width: 120px !important;
-    height:fit-content;
+    height: fit-content;
     outline: none;
 
 }
@@ -481,59 +483,61 @@ button:hover {
 #topSellingItems li:hover {
     background-color: #e0e0e0;
 }
-/* Modal styling */.modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
 
-        .modal-content {
-            position: relative;
-            background-color: white;
-            padding: 20px;
-            margin: 15% auto;
-            width: 40%;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
 
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 20px;
-            cursor: pointer;
-            color: red;
-            background: none;
-            border: none;
-        }
+.modal-content {
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    margin: 15% auto;
+    width: 40%;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
 
-        .close:hover {
-            color: darkred;
-        }
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: red;
+    background: none;
+    border: none;
+}
 
-        /* Button Styling */
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin: 10px 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s ease-in-out;
-        }
+.close:hover {
+    color: darkred;
+}
 
-        button:hover {
-            background-color: #2980b9;
-        }
+/* Button Styling */
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 10px 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
 
 
 /* Responsive Design */
@@ -581,7 +585,3 @@ button:hover {
         justify-content: flex-start;
     }
 }
-
-
-
-
