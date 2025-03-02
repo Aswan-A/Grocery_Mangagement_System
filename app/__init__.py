@@ -2,7 +2,7 @@ from flask import Flask
 from app.routes import login, manager, staff
 import os
 from dotenv import load_dotenv
-from app.db import create_tables
+from app.db import create_auth_tables
 
 # Load environment variables
 load_dotenv()
@@ -23,6 +23,6 @@ def create_app():
 
     # Create tables and insert data before the first request
     with app.app_context():
-        create_tables()
+        create_auth_tables()
 
     return app

@@ -1,7 +1,8 @@
 from datetime import datetime , date
 from flask import Blueprint, Response, json, render_template, request, jsonify
 import mysql
-from app.db import get_db_connection
+from app.routes.login import get_db_connection
+
 
 # Define Blueprint for staff routes
 staff_bp = Blueprint('staff', __name__,url_prefix='/staff')
