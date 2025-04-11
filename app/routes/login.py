@@ -38,7 +38,7 @@ def login():
     cursor.close()
     connection.close()
     create_tables()
-
+    create_age_check_trigger()
     return jsonify({
         'success': success,
         'message': message,
@@ -126,3 +126,34 @@ def create_tables():
             print("Database does not exist")
         else:
             print(err)
+
+def create_age_check_trigger():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+        # Drop trigger if it exists
+        cursor.execute("DROP TRIGGER IF EXISTS check_employee_age_before_insert;")
+        
+        # Create the trigger without DELIMITER syntax
+        trigger_sql = """
+        CREATE TRIGGER check_employee_age_before_insert
+        BEFORE INSERT ON employees
+        FOR EACH ROW
+        BEGIN
+            IF TIMESTAMPDIFF(YEAR, NEW.DOB, CURDATE()) < 18 THEN
+                SIGNAL SQLSTATE '45000' 
+                SET MESSAGE_TEXT = 'Employee must be at least 18 years old.';
+            END IF;
+        END;
+        """
+        
+        cursor.execute(trigger_sql)
+        connection.commit()
+        print("Trigger created successfully!")
+
+    except Exception as e:
+        print(f"Error creating trigger: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()

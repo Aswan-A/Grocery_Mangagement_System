@@ -149,7 +149,7 @@ def add_employee():
         employee_id = data.get('employeeId')
         employee_name = data.get('employeeName')
         mobile_number = data.get('mobileNumber')
-        dob = data.get('DOB')
+        dob = data.get('dob')
         address = data.get('address')
         join_date = data.get('joinDate')
         
@@ -176,8 +176,15 @@ def add_employee():
         }), 201
 
     except Exception as e:
-        print(f"Error: {str(e)}")  # Log the error to the console
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        error_message = str(e)
+        print(f"Error: {error_message}")  # Optional: Log the error
+
+        # Send the MySQL error message back to frontend
+        return jsonify({
+            "success": False,
+            "error": "Internal server error",
+            "details": error_message
+        }), 500
 
 # Delete an employee by employeeId
 @staff_bp.route('/api/employee/<string:employee_id>', methods=['DELETE'])

@@ -1,9 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-
-  document.getElementById("logoutBtn").addEventListener("click", function() {
+  document.getElementById("logoutBtn").addEventListener("click", function () {
     window.location.href = "/"; // Redirects to login.html
-});
-
+  });
 
   // Handle stock actions
   const stockTable = document
@@ -76,46 +74,47 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  document
+    .getElementById("addstckbtn")
+    .addEventListener("click", async function () {
+      let productId = document.getElementById("addstckId").value.trim();
+      let quantity = document.getElementById("addstckQuan").value.trim();
 
-  document.getElementById("addstckbtn").addEventListener("click", async function () {
-    let productId = document.getElementById("addstckId").value.trim();
-    let quantity = document.getElementById("addstckQuan").value.trim();
-
-    if (!productId || !quantity) {
-      alert("⚠️ Please fill in both Product ID and Quantity.");
-      return;
-    }
-
-    let data = {
-      productId: productId,
-      quantity: parseInt(quantity)
-    };
-
-    try {
-      let response = await fetch(`api/add_stock`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      });
-
-      // Handle non-JSON responses
-      let result = await response.json();
-
-      if (response.ok) {
-        alert(`✅ Success: ${result.message}`);
-        loadStocks();
-        addstckId.value = "";
-        addstckQuan.value = "";
-      } else {
-        alert(`❌ Error: ${result.error || "Something went wrong."}`);
+      if (!productId || !quantity) {
+        alert("⚠️ Please fill in both Product ID and Quantity.");
+        return;
       }
-    } catch (error) {
-      console.error("Network Error:", error);
-      alert("❌ A network error occurred. Please try again.");
-    }
-  });
+
+      let data = {
+        productId: productId,
+        quantity: parseInt(quantity),
+      };
+
+      try {
+        let response = await fetch(`api/add_stock`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        // Handle non-JSON responses
+        let result = await response.json();
+
+        if (response.ok) {
+          alert(`✅ Success: ${result.message}`);
+          loadStocks();
+          addstckId.value = "";
+          addstckQuan.value = "";
+        } else {
+          alert(`❌ Error: ${result.error || "Something went wrong."}`);
+        }
+      } catch (error) {
+        console.error("Network Error:", error);
+        alert("❌ A network error occurred. Please try again.");
+      }
+    });
 
   // Add new stock
   addStockBtn.addEventListener("click", function () {
@@ -306,9 +305,13 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Employee added:", data);
-        loadEmployees();
-        employeePopup.style.display = "none";
+        if (data.success === false) {
+          alert(data.details); // <--- Show trigger error from backend
+        } else {
+          console.log("Employee added:", data);
+          loadEmployees();
+          employeePopup.style.display = "none";
+        }
       })
       .catch((err) => console.error("Error adding employee:", err));
   });
@@ -624,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
           alert(`Bill generated successfully! Total: ₹${data.totalAmount}`);
           billItems = [];
           updateBillTable();
-          loadStocks()
+          loadStocks();
         }
       })
       .catch((error) => {
@@ -654,7 +657,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     });
 
-
   document
     .getElementById("getTopSellingItemsBtn")
     .addEventListener("click", function () {
@@ -673,7 +675,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
           data.top_selling_items.forEach((item, index) => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity} sold`;
+            listItem.textContent = `${index + 1}. ${item.productName} - ${
+              item.total_quantity
+            } sold`;
             itemList.appendChild(listItem);
           });
         })
@@ -682,13 +686,17 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     });
 
-  document.getElementById('getTotalSalesBtn').addEventListener('click', function () {
-    document.getElementById('totalSalesModal').style.display = 'block';
-  });
+  document
+    .getElementById("getTotalSalesBtn")
+    .addEventListener("click", function () {
+      document.getElementById("totalSalesModal").style.display = "block";
+    });
 
-  document.getElementById('getTopSellingItemsBtn').addEventListener('click', function () {
-    document.getElementById('topSellingModal').style.display = 'block';
-  });
+  document
+    .getElementById("getTopSellingItemsBtn")
+    .addEventListener("click", function () {
+      document.getElementById("topSellingModal").style.display = "block";
+    });
 
   // Function to close modal
   function closeModal(modalId) {
@@ -703,13 +711,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-
   // Close modal when clicking outside content
   window.onclick = function (event) {
-    let modals = document.querySelectorAll('.modal');
+    let modals = document.querySelectorAll(".modal");
     modals.forEach((modal) => {
       if (event.target == modal) {
-        modal.style.display = 'none';
+        modal.style.display = "none";
       }
     });
   };
