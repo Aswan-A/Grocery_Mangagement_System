@@ -42,18 +42,18 @@ document.addEventListener("DOMContentLoaded", function () {
         stocks.forEach((stock) => {
           const row = stockTable.insertRow();
           row.innerHTML = `
-                        <td>${stock.productId}</td>
-                        <td>${stock.productName}</td>
-                        <td>${stock.brand}</td>
-                        <td>${stock.category}</td>
-                        <td>${stock.quantity}</td>
-                        <td>${stock.price}</td>
-                        <td>
-                            <button class="view-btn" style="border-radius: 5px;" data-id="${stock.productId}">View</button>
-                            <button class="edit-btn" style="border-radius: 5px;" data-id="${stock.productId}">Edit</button>
-                            <button class="delete-btn" style="border-radius: 5px;" data-id="${stock.productId}">Delete</button>
-                        </td>
-                    `;
+                          <td>${stock.productId}</td>
+                          <td>${stock.productName}</td>
+                          <td>${stock.brand}</td>
+                          <td>${stock.category}</td>
+                          <td>${stock.quantity}</td>
+                          <td>${stock.price}</td>
+                          <td>
+                              <button class="view-btn" style="border-radius: 5px;" data-id="${stock.productId}">View</button>
+                              <button class="edit-btn" style="border-radius: 5px;" data-id="${stock.productId}">Edit</button>
+                              <button class="delete-btn" style="border-radius: 5px;" data-id="${stock.productId}">Delete</button>
+                          </td>
+                      `;
         });
       })
       .catch((err) => console.error("Error loading stocks:", err));
@@ -173,13 +173,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((stock) => {
           const stockDetails = document.getElementById("stockDetails");
           stockDetails.innerHTML = `
-                    <p><strong>Product ID:</strong> ${stock.productId}</p>
-                    <p><strong>Product:</strong> ${stock.productName}</p>
-                    <p><strong>Brand:</strong> ${stock.brand}</p>
-                    <p><strong>Category:</strong> ${stock.category}</p>
-                    <p><strong>Quantity:</strong> ${stock.quantity}</p>
-                    <p><strong>Price:</strong> ${stock.price}</p>
-                `;
+                      <p><strong>Product ID:</strong> ${stock.productId}</p>
+                      <p><strong>Product:</strong> ${stock.productName}</p>
+                      <p><strong>Brand:</strong> ${stock.brand}</p>
+                      <p><strong>Category:</strong> ${stock.category}</p>
+                      <p><strong>Quantity:</strong> ${stock.quantity}</p>
+                      <p><strong>Price:</strong> ${stock.price}</p>
+                  `;
           stockDetailsPopup.style.display = "flex";
         })
         .catch((err) => console.error("Error fetching stock details:", err));
@@ -222,11 +222,10 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((data) => {
           if (data.success === false) {
             alert(data.details); // <--- Show trigger error from backend
-          }
-          else{
-          console.log("Stock added:", data);
-          loadStocks();
-          popup.style.display = "none";
+          } else {
+            console.log("Stock added:", data);
+            loadStocks();
+            popup.style.display = "none";
           }
         })
         .catch((err) => console.error("Error adding stock:", err));
@@ -264,18 +263,18 @@ document.addEventListener("DOMContentLoaded", function () {
         employees.forEach((employee) => {
           const row = employeeTable.insertRow();
           row.innerHTML = `
-                        <td>${employee.employeeId}</td>
-                        <td>${employee.employeeName}</td>
-                        <td>${employee.mobileNumber}</td>
-                        <td>${employee.joinDate}</td>
-                        <td>${employee.DOB}</td>
-                        <td>${employee.address}</td>
-                        <td>
-                            <button class="view-btn-emp" data-id="${employee.employeeId}">View</button>
-                            <button class="edit-btn-emp" data-id="${employee.employeeId}">Edit</button>
-                            <button class="delete-btn-emp" data-id="${employee.employeeId}">Delete</button>
-                        </td>
-                    `;
+                          <td>${employee.employeeId}</td>
+                          <td>${employee.employeeName}</td>
+                          <td>${employee.mobileNumber}</td>
+                          <td>${employee.joinDate}</td>
+                          <td>${employee.DOB}</td>
+                          <td>${employee.address}</td>
+                          <td>
+                              <button class="view-btn-emp" data-id="${employee.employeeId}">View</button>
+                              <button class="edit-btn-emp" data-id="${employee.employeeId}">Edit</button>
+                              <button class="delete-btn-emp" data-id="${employee.employeeId}">Delete</button>
+                          </td>
+                      `;
         });
       })
       .catch((err) => console.error("Error loading employees:", err));
@@ -283,26 +282,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Add new employee
   addEmployeeBtn.addEventListener("click", function () {
+    employeeForm.reset();
     employeePopup.style.display = "flex";
   });
 
   closeEmployeePopupBtn.addEventListener("click", function () {
     employeePopup.style.display = "none";
   });
-
   employeeForm.addEventListener("submit", function (e) {
     e.preventDefault();
+  
+    const employeeId = document.getElementById("employeeId").value;
+  
+    const isEditing =
+      document.getElementById("employeeSubmitBtn").textContent === "Update Employee";
+  
     const newEmployee = {
-      employeeId: document.getElementById("employeeId").value,
+      employeeId: employeeId,
       employeeName: document.getElementById("employeeName").value,
       mobileNumber: document.getElementById("mobileNumber").value,
       dob: document.getElementById("employeeDob").value,
       address: document.getElementById("employeeAddress").value,
       joinDate: document.getElementById("joinDate").value,
     };
-
-    fetch("/staff/api/employee", {
-      method: "POST",
+  
+    const url = isEditing
+      ? `/staff/api/employee/${employeeId}`   // <-- PUT to /staff/api/employee/34
+      : "/staff/api/employee";                // <-- POST to /staff/api/employee
+  
+    const method = isEditing ? "PUT" : "POST";
+  
+    fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },
@@ -311,16 +322,21 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.success === false) {
-          alert(data.details); // <--- Show trigger error from backend
+          alert(data.details);
         } else {
-          console.log("Employee added:", data);
+          console.log(isEditing ? "Employee updated:" : "Employee added:", data);
           loadEmployees();
           employeePopup.style.display = "none";
+  
+          // Reset popup to default
+          document.getElementById("employeePopup").querySelector("h2").textContent = "Add New Employee";
+          document.getElementById("employeeSubmitBtn").textContent = "Add Employee";
+          employeeForm.reset();
         }
       })
-      .catch((err) => console.error("Error adding employee:", err));
+      .catch((err) => console.error("Error saving employee:", err));
   });
-
+  
   // Delete employee
   employeeTable.addEventListener("click", function (e) {
     // Delete employee
@@ -338,7 +354,81 @@ document.addEventListener("DOMContentLoaded", function () {
           .catch((err) => console.error("Error deleting employee:", err));
       }
     }
+    if (e.target.classList.contains("view-btn-emp")) {
+      const employeeId = e.target.getAttribute("data-id");
+      fetch(`/staff/api/employee/${employeeId}`,{method: "GET",})
+        .then((response) => response.json())
+        .then((employee) => {
+          const employeeDetails = document.getElementById("employeeDetails");
+          employeeDetails.innerHTML = `
+              <p><strong>Employee ID:</strong> ${employee.employeeId}</p>
+              <p><strong>Name:</strong> ${employee.employeeName}</p>
+              <p><strong>Mobile Number:</strong> ${employee.mobileNumber}</p>
+              <p><strong>Date of Birth:</strong> ${employee.DOB}</p>
+              <p><strong>Address:</strong> ${employee.address}</p>
+              <p><strong>Join Date:</strong> ${employee.joinDate}</p>
+            `;
+
+          // Show the details popup
+          document.getElementById("employeeDetailsPopup").style.display =
+            "flex";
+
+          // Set up edit and delete buttons in the popup
+          document
+            .getElementById("editEmployeeBtn")
+            .setAttribute("data-id", employee.employeeId);
+          document
+            .getElementById("deleteEmployeeBtn")
+            .setAttribute("data-id", employee.employeeId);
+        })
+        .catch((err) => console.error("Error fetching employee details:", err));
+    }
+
+    // Handle Edit employee button click
+    // Handle Edit employee button click
+    if (e.target.classList.contains("edit-btn-emp")) {
+      const employeeId = e.target.getAttribute("data-id");
+    
+      fetch(`/staff/api/employee/${employeeId}`)
+        .then((response) => response.json())
+        .then((employee) => {
+          console.log(employee); // 🔥 Check if DOB/joinDate is correct
+    
+          document.getElementById("employeePopup").querySelector("h2").textContent = "Edit Employee";
+          document.getElementById("employeeSubmitBtn").textContent = "Update Employee";
+    
+          document.getElementById("employeeId").value = employee.employeeId;
+          document.getElementById("employeeName").value = employee.employeeName;
+          document.getElementById("mobileNumber").value = employee.mobileNumber;
+    
+          const dobISO = new Date(employee.DOB).toISOString().split('T')[0];
+          const joinDateISO = new Date(employee.joinDate).toISOString().split('T')[0];
+        
+          document.getElementById("employeeDob").value = dobISO;   
+          document.getElementById("joinDate").value = joinDateISO;
+        
+          document.getElementById("employeeAddress").value = employee.address;
+        
+          document.getElementById("employeePopup").style.display = "flex";
+        
+          employeeForm.setAttribute("data-editing", "true");
+          employeeForm.setAttribute("data-employee-id", employeeId);
+        })
+        .catch((error) => {
+          console.error("Error fetching employee details:", error);
+        });
+    }
+    
+
+    
   });
+
+  // Close employee details popup
+  document
+    .getElementById("closeEmployeeDetailsPopup")
+    .addEventListener("click", function () {
+      document.getElementById("employeeDetailsPopup").style.display = "none";
+    });
 
   const attendanceSearchInput = document.getElementById("attendanceSearch");
 
@@ -574,13 +664,13 @@ document.addEventListener("DOMContentLoaded", function () {
     billItems.forEach((item) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td>${item.productId}</td>
-                <td>${item.productName}</td>
-                <td>${item.price}</td>
-                <td>${item.quantity}</td>
-                <td>${item.total}</td>
-                <td><button class="remove-btn" data-product-id="${item.productId}">Remove</button></td>
-            `;
+                  <td>${item.productId}</td>
+                  <td>${item.productName}</td>
+                  <td>${item.price}</td>
+                  <td>${item.quantity}</td>
+                  <td>${item.total}</td>
+                  <td><button class="remove-btn" data-product-id="${item.productId}">Remove</button></td>
+              `;
       tableBody.appendChild(row);
       totalAmount += item.total;
     });
@@ -680,8 +770,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
           data.top_selling_items.forEach((item, index) => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity
-              } sold`;
+            listItem.textContent = `${index + 1}. ${item.productName} - ${
+              item.total_quantity
+            } sold`;
             itemList.appendChild(listItem);
           });
         })

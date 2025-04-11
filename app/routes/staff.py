@@ -217,6 +217,65 @@ def delete_employee(employee_id):
 
     except Exception as e:
         return jsonify({"error": "Error deleting employee", "details": str(e)}), 500
+    
+@staff_bp.route('/api/employee/<string:employee_id>', methods=['PUT'])
+def update_employee(employee_id):
+    try:
+        # Get data from request
+        data = request.get_json()
+        employee_name = data.get('employeeName')
+        mobile_number = data.get('mobileNumber')
+        dob = data.get('dob')
+        address = data.get('address')
+        join_date = data.get('joinDate')
+        
+        # Validate data
+        if not employee_name or not join_date:
+            return jsonify({"error": "Employee Name and Join Date are required"}), 400
+                
+        # Establish DB connection
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Update employee data
+        cursor.execute('''UPDATE employees 
+                          SET employeeName = %s, mobileNumber = %s, DOB = %s, address = %s, joinDate = %s
+                          WHERE employeeId = %s''', 
+                          (employee_name, mobile_number, dob, address, join_date, employee_id))
+        connection.commit()
+            
+        cursor.close()
+        connection.close()
+        
+        return jsonify({
+            "message": "Employee updated successfully!",
+            "employeeId": employee_id
+        })
+
+    except Exception as e:
+        error_message = str(e)
+        print(f"Error: {error_message}")
+        
+        return jsonify({
+            "success": False,
+            "error": "Internal server error",
+            "details": error_message
+        }), 500
+    
+
+@staff_bp.route('/api/employee/<string:employee_id>', methods=['GET'])
+def get_employees(employee_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM employees WHERE employeeId = %s", (employee_id,))
+    employee = cursor.fetchone()  # Only fetch one row based on productId
+    cursor.close()
+    connection.close()
+    
+    if employee:
+        return jsonify(employee)
+    else:
+        return jsonify({"error": "Employee not found"}), 404
 
 
 # Fetch all employee data
