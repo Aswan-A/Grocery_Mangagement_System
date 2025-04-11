@@ -220,9 +220,14 @@ document.addEventListener("DOMContentLoaded", function () {
       })
         .then((response) => response.json())
         .then((data) => {
+          if (data.success === false) {
+            alert(data.details); // <--- Show trigger error from backend
+          }
+          else{
           console.log("Stock added:", data);
           loadStocks();
           popup.style.display = "none";
+          }
         })
         .catch((err) => console.error("Error adding stock:", err));
     } else if (formMode === "edit") {
@@ -675,9 +680,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
           data.top_selling_items.forEach((item, index) => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${index + 1}. ${item.productName} - ${
-              item.total_quantity
-            } sold`;
+            listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity
+              } sold`;
             itemList.appendChild(listItem);
           });
         })
@@ -689,13 +693,21 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("getTotalSalesBtn")
     .addEventListener("click", function () {
-      document.getElementById("totalSalesModal").style.display = "block";
+      const selectedDate = document.getElementById("salesDate").value;
+
+      if (selectedDate) {
+        document.getElementById("totalSalesModal").style.display = "block";
+      }
     });
 
   document
     .getElementById("getTopSellingItemsBtn")
     .addEventListener("click", function () {
-      document.getElementById("topSellingModal").style.display = "block";
+      const selectedDate = document.getElementById("salesDate").value;
+
+      if (selectedDate) {
+        document.getElementById("topSellingModal").style.display = "block";
+      }
     });
 
   // Function to close modal

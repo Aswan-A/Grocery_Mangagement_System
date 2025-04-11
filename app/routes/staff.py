@@ -63,25 +63,37 @@ def add_stock():
 # Add new item
 @staff_bp.route('api/item', methods=['POST'])
 def add_item():
-    data = request.get_json()
-    product_id = data['productId']
-    product_name = data['product']
-    brand = data['brand']
-    category = data['category']
-    quantity = data['quantity']
-    price = data['price']
+    try:
+        data = request.get_json()
+        product_id = data['productId']
+        product_name = data['product']
+        brand = data['brand']
+        category = data['category']
+        quantity = data['quantity']
+        price = data['price']
     
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("""
-        INSERT INTO stocks (productId, productName, brand, category, quantity, price)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """, (product_id, product_name, brand, category, quantity, price))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("""
+            INSERT INTO stocks (productId, productName, brand, category, quantity, price)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (product_id, product_name, brand, category, quantity, price))
+        connection.commit()
+        cursor.close()
+        connection.close()
     
-    return jsonify({"message": "Stock added successfully!"}), 201
+        return jsonify({"message": "Stock added successfully!"}), 201
+    
+    except Exception as e:
+        error_message = str(e)
+        print(f"Error: {error_message}")  
+
+        # Send the MySQL error message back to frontend
+        return jsonify({
+            "success": False,
+            "error": "Internal server error",
+            "details": error_message
+        }), 500
 
 
 # Fetch single stock by product ID

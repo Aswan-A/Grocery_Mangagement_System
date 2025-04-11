@@ -39,6 +39,7 @@ def login():
     connection.close()
     create_tables()
     create_age_check_trigger()
+    create_product_id_check_trigger()
     return jsonify({
         'success': success,
         'message': message,
@@ -61,14 +62,7 @@ def create_tables():
         cursor = connection.cursor()
 
         # SQL statements for creating the tables
-        create_users_table = """
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(100) NOT NULL UNIQUE,
-                password VARCHAR(100) NOT NULL,
-                role VARCHAR(50) NOT NULL
-            );
-        """
+       
         create_stocks_table = """
             CREATE TABLE IF NOT EXISTS stocks (
                 productId VARCHAR(50) PRIMARY KEY,
@@ -148,6 +142,41 @@ def create_age_check_trigger():
         END;
         """
         
+        cursor.execute(trigger_sql)
+        connection.commit()
+        print("Trigger created successfully!")
+
+    except Exception as e:
+        print(f"Error creating trigger: {str(e)}")
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def create_product_id_check_trigger():
+    # Establish database connection
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+        # Drop the trigger if it exists
+        cursor.execute("DROP TRIGGER IF EXISTS before_insert_stock;")
+
+        # SQL to create the trigger
+        trigger_sql = """
+        CREATE TRIGGER before_insert_stock
+        BEFORE INSERT ON stocks
+        FOR EACH ROW
+        BEGIN
+            -- Check if the productId already exists
+            IF EXISTS (SELECT 1 FROM stocks WHERE productId = NEW.productId) THEN
+                SIGNAL SQLSTATE '45001'
+                SET MESSAGE_TEXT = 'Product with this ID already exists!';
+            END IF;
+        END;
+        """
+        
+        # Execute the SQL to create the trigger
         cursor.execute(trigger_sql)
         connection.commit()
         print("Trigger created successfully!")
