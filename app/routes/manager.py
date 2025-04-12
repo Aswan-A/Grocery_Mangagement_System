@@ -22,7 +22,7 @@ def get_all_sales():
     print(json.dumps(stocks, indent=4))  # Converts to readable JSON format
     return jsonify(stocks)
 
-@bp.route('/api/stock', methods=['GET'])
+@bp.route('api/stock', methods=['GET'])
 def get_all_stocks():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -44,6 +44,28 @@ def get_all_stocks():
     cursor.close()
     connection.close()
     return jsonify(stocks)
+
+
+@bp.route('/api/categories', methods=['GET'])
+def get_categories():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    cursor.execute("SELECT DISTINCT categoryName FROM categories")
+    categories = cursor.fetchall()
+    
+    connection.close()
+    
+    return jsonify(categories)
+
+
+
+
+
+
+
+
+
 
 # Route to get all attendance records
 @bp.route('/api/attendance', methods=['GET'])

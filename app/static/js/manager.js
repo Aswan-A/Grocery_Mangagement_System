@@ -5,13 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
   const stockFilter = document.getElementById('stockFilter');
   const attendanceFilter = document.getElementById('attendanceFilter');
   const salesFilter = document.getElementById('salesFilter');
+  const stockSearchInput = document.getElementById("stockSearch");
 
   const attendanceSearch = document.getElementById('attendanceSearch');
   const dateFilter = document.getElementById('dateFilter');
 
 
   loadStocks();
-
+  loadCategories();
   function loadStocks() {
     fetch("/manager/api/stock")
       .then((response) => response.json())
@@ -42,14 +43,51 @@ document.addEventListener('DOMContentLoaded', function () {
       tableBody.appendChild(tr);
     });
   }
+  stockSearchInput.addEventListener("input", function () {
+    const query = stockSearchInput.value.toLowerCase();
+    const rows = stockTable.getElementsByTagName("tr");
+    Array.from(rows).forEach((row) => {
+      const productName = row.cells[0].textContent.toLowerCase();
+      if (productName.includes(query)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  });
 
 
 
 
+  function loadCategories() {
+    fetch("/manager/api/categories")
+      .then(response => response.json())
+      .then(categories => {
+        const categoryFilter = document.getElementById("categoryFilter");
+        categoryFilter.innerHTML = '<option value="">All</option>'; // Default option
+        
+        categories.forEach(cat => {
+          const option = document.createElement("option");
+          option.value = cat.categoryName;
+          option.textContent = cat.categoryName;
+          categoryFilter.appendChild(option);
+        });
+      })
+      .catch(err => console.error("Error loading categories:", err));
+  }
 
-
-
-
+  document.getElementById("categoryFilter").addEventListener("change", function() {
+    const selectedCategory = this.value.toLowerCase();
+    const rows = stockTable.getElementsByTagName("tr");
+    Array.from(rows).forEach((row) => {
+      const productName = row.cells[1].textContent.toLowerCase();
+      if (productName.includes(selectedCategory)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  });
 
 
 

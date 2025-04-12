@@ -383,37 +383,41 @@ def get_absentees():
 
     connection.close()
     return jsonify(absentee_list)
-
 @staff_bp.route('/api/mark_attendance', methods=['POST'])
 def mark_attendance():
     data = request.get_json()  # Getting the data sent from the frontend
     employee_id = data['employeeId']
     date = data['date']
-    status = 'present'  # Default status, you can modify this if needed (e.g., for absent status)
+    status = 'present'  # Default status
 
     connection = get_db_connection()
+    if connection is None:
+        return jsonify({'success': False, 'message': 'Failed to connect to the database.'}), 500
+
     cursor = connection.cursor()
 
-    # Check if the employee already has attendance for today
-    cursor.execute("""
-    SELECT * FROM attendance WHERE employeeId = %s AND Date = %s
-    """, (employee_id, date))
-    existing_attendance = cursor.fetchone()
+    try:
+        cursor.execute("""
+        SELECT * FROM attendance WHERE employeeId = %s AND Date = %s
+        """, (employee_id, date))
+        existing_attendance = cursor.fetchone()
 
-    if existing_attendance:
-        # If attendance already exists for today, return a response saying so
-        return jsonify({'success': False, 'message': 'Attendance already marked for today.'}), 400
+        if existing_attendance:
+            return jsonify({'success': False, 'message': 'Attendance already marked for today.'}), 400
 
-    # If attendance doesn't exist for today, insert the new record
-    cursor.execute("""
-    INSERT INTO attendance (employeeId, Date, Status)
-    VALUES (%s, %s, %s)
-    """, (employee_id, date, status))
+        cursor.execute("""
+        INSERT INTO attendance (employeeId, Date, Status)
+        VALUES (%s, %s, %s)
+        """, (employee_id, date, status))
 
-    connection.commit()
-    connection.close()
-
-    return jsonify({'success': True, 'message': 'Attendance marked successfully!'}), 200
+        connection.commit()
+        return jsonify({'success': True, 'message': 'Attendance marked successfully!'}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        connection.rollback()
+        return jsonify({'success': False, 'message': 'Failed to record attendance.'}), 500
+    finally:
+        connection.close()
 
 
 # Fetch product details by productId (for billing section)
