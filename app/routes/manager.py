@@ -26,12 +26,26 @@ def get_all_sales():
 def get_all_stocks():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM stocks")
+
+    cursor.execute("""
+        SELECT 
+            s.productId,
+            s.productName,
+            b.brandName AS brand,
+            c.categoryName AS category,
+            s.quantity,
+            s.price
+        FROM stocks s
+        LEFT JOIN brands b ON s.brandId = b.brandId
+        LEFT JOIN categories c ON s.categoryId = c.categoryId
+    """)
+
     stocks = cursor.fetchall()
     cursor.close()
     connection.close()
     return jsonify(stocks)
-# ✅ Route to get all attendance records
+
+# Route to get all attendance records
 @bp.route('/api/attendance', methods=['GET'])
 def get_all_attendance():
     connection = get_db_connection()
@@ -54,13 +68,13 @@ def get_all_attendance():
     cursor.close()
     connection.close()
 
-    # ✅ Rename 'formatted_date' to 'date' before returning
+    # Rename 'formatted_date' to 'date' before returning
     for row in attendance:
         row['date'] = row.pop('formatted_date')
 
     return jsonify(attendance)
 
-# ✅ Route to get absentee list
+# Route to get absentee list
 @bp.route('/api/get_absentees', methods=['GET'])
 def get_absentees():
     connection = get_db_connection()
@@ -85,7 +99,7 @@ def get_absentees():
 
     return jsonify(absentees)
 
-# ✅ Route to get total sales
+# Route to get total sales
 @bp.route('/get_total_sales', methods=['GET'])
 def get_total_sales():
     date = request.args.get('date')
@@ -119,7 +133,7 @@ def get_total_sales():
         cursor.close()
         connection.close()
 
-# ✅ Route to get top-selling items
+# Route to get top-selling items
 @bp.route('/get_top_selling_items', methods=['GET'])
 def get_top_selling_items():
     date = request.args.get('date')
@@ -156,17 +170,25 @@ def get_top_selling_items():
         cursor.close()
         connection.close()
 
-# ✅ New Route to Check Out-of-Stock Items
+# Check Out-of-Stock Items
 @bp.route('/api/check_out_of_stock', methods=['GET'])
 def check_out_of_stock():
-    """Fetch items with quantity = 0"""
+    """Fetch items with quantity = 0 (out of stock)"""
     connection = get_db_connection()
     if connection is None:
         return jsonify({"error": "Database connection failed"}), 500
 
     try:
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT productId, productName, brand FROM stocks WHERE quantity = 0"
+        query = """
+            SELECT 
+                s.productId,
+                s.productName,
+                b.brandName AS brand
+            FROM stocks s
+            LEFT JOIN brands b ON s.brandId = b.brandId
+            WHERE s.quantity = 0
+        """
         cursor.execute(query)
         out_of_stock_items = cursor.fetchall()
 

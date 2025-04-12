@@ -1,6 +1,7 @@
 import mysql.connector
 from flask import current_app
 from mysql.connector import errorcode
+import bcrypt
 
 
 def get_auth_db_connection():
@@ -17,7 +18,7 @@ def get_auth_db_connection():
 def create_auth_tables():
     try:
         # Establishing connection to MySQL
-        connection = get_auth_db_connection()
+        connection = get_auth_db_connection()  # Replace with your connection method
         cursor = connection.cursor()
 
         # SQL statements for creating the tables
@@ -25,23 +26,29 @@ def create_auth_tables():
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(100) NOT NULL UNIQUE,
-                password VARCHAR(100) NOT NULL,
+                password VARCHAR(255) NOT NULL,
                 role VARCHAR(50) NOT NULL
             );
         """
-        # Execute the SQL queries to create tables
+        
         cursor.execute(create_users_table)
-    
-        # Insert default users into the 'users' table
+
         insert_users = """
             INSERT IGNORE INTO users (username, password, role)
             VALUES
-            ('admin', 'adminpass', 'manager'),
-            ('staff', 'staffpass', 'staff');
+            (%s, %s, %s),
+            (%s, %s, %s);
         """
-        cursor.execute(insert_users)
         
-        # Commit the changes and close the connection
+        # Hash passwords using bcrypt before inserting
+        hashed_admin_pass = bcrypt.hashpw('adminpass'.encode('utf-8'), bcrypt.gensalt())
+        hashed_staff_pass = bcrypt.hashpw('staffpass'.encode('utf-8'), bcrypt.gensalt())
+        
+        cursor.execute(insert_users, (
+            'admin', hashed_admin_pass.decode('utf-8'), 'manager',
+            'staff', hashed_staff_pass.decode('utf-8'), 'staff'
+        ))
+
         connection.commit()
         cursor.close()
         connection.close()

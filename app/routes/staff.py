@@ -19,7 +19,20 @@ def staff_dashboard():
 def get_all_stocks():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM stocks")
+
+    cursor.execute("""
+        SELECT 
+            s.productId,
+            s.productName,
+            b.brandName AS brand,
+            c.categoryName AS category,
+            s.quantity,
+            s.price
+        FROM stocks s
+        LEFT JOIN brands b ON s.brandId = b.brandId
+        LEFT JOIN categories c ON s.categoryId = c.categoryId
+    """)
+
     stocks = cursor.fetchall()
     cursor.close()
     connection.close()
@@ -67,33 +80,53 @@ def add_item():
         data = request.get_json()
         product_id = data['productId']
         product_name = data['product']
-        brand = data['brand']
-        category = data['category']
+        brand_name = data['brand']
+        category_name = data['category']
         quantity = data['quantity']
         price = data['price']
-    
+
         connection = get_db_connection()
         cursor = connection.cursor()
+
+        cursor.execute("SELECT brandId FROM brands WHERE brandName = %s", (brand_name,))
+        brand = cursor.fetchone()
+
+        if brand:
+            brand_id = brand[0]
+        else:
+            cursor.execute("INSERT INTO brands (brandName) VALUES (%s)", (brand_name,))
+            brand_id = cursor.lastrowid
+
+        cursor.execute("SELECT categoryId FROM categories WHERE categoryName = %s", (category_name,))
+        category = cursor.fetchone()
+
+        if category:
+            category_id = category[0]
+        else:
+            cursor.execute("INSERT INTO categories (categoryName) VALUES (%s)", (category_name,))
+            category_id = cursor.lastrowid
+
         cursor.execute("""
-            INSERT INTO stocks (productId, productName, brand, category, quantity, price)
+            INSERT INTO stocks (productId, productName, brandId, categoryId, quantity, price)
             VALUES (%s, %s, %s, %s, %s, %s)
-        """, (product_id, product_name, brand, category, quantity, price))
+        """, (product_id, product_name, brand_id, category_id, quantity, price))
+
         connection.commit()
         cursor.close()
         connection.close()
-    
+
         return jsonify({"message": "Stock added successfully!"}), 201
-    
+
     except Exception as e:
         error_message = str(e)
-        print(f"Error: {error_message}")  
+        print(f"Error: {error_message}")
 
-        # Send the MySQL error message back to frontend
         return jsonify({
             "success": False,
             "error": "Internal server error",
             "details": error_message
         }), 500
+
 
 
 # Fetch single stock by product ID
@@ -116,24 +149,58 @@ def get_stock(product_id):
 # Update stock details
 @staff_bp.route('/api/stock/<string:product_id>', methods=['PUT'])
 def update_stock(product_id):
-    data = request.get_json()
-    product_name = data['product']
-    brand = data['brand']
-    category = data['category']
-    quantity = data['quantity']
-    price = data['price']
-    
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("""
-        UPDATE stocks SET productName = %s, brand = %s, category = %s, 
-        quantity = %s, price = %s WHERE productId = %s
-    """, (product_name, brand, category, quantity, price, product_id))
-    connection.commit()
-    cursor.close()
-    connection.close()
-    
-    return jsonify({"message": "Stock updated successfully!"})
+    try:
+        data = request.get_json()
+        product_name = data['product']
+        brand_name = data['brand']
+        category_name = data['category']
+        quantity = data['quantity']
+        price = data['price']
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT brandId FROM brands WHERE brandName = %s", (brand_name,))
+        brand = cursor.fetchone()
+        if brand:
+            brand_id = brand[0]
+        else:
+            cursor.execute("INSERT INTO brands (brandName) VALUES (%s)", (brand_name,))
+            brand_id = cursor.lastrowid
+
+        cursor.execute("SELECT categoryId FROM categories WHERE categoryName = %s", (category_name,))
+        category = cursor.fetchone()
+        if category:
+            category_id = category[0]
+        else:
+            cursor.execute("INSERT INTO categories (categoryName) VALUES (%s)", (category_name,))
+            category_id = cursor.lastrowid
+
+        cursor.execute("""
+            UPDATE stocks
+            SET productName = %s,
+                brandId = %s,
+                categoryId = %s,
+                quantity = %s,
+                price = %s
+            WHERE productId = %s
+        """, (product_name, brand_id, category_id, quantity, price, product_id))
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        return jsonify({"message": "Stock updated successfully!"})
+
+    except Exception as e:
+        error_message = str(e)
+        print(f"Error updating stock: {error_message}")
+        return jsonify({
+            "success": False,
+            "error": "Internal server error",
+            "details": error_message
+        }), 500
+
 
 # Delete a stock item
 @staff_bp.route('/api/stock/<string:product_id>', methods=['DELETE'])
@@ -152,7 +219,7 @@ def delete_stock(product_id):
 
 # # --- Employee Management Routes ---
 
-# Endpoint to add a new employee
+# add a new employee
 @staff_bp.route('/api/employee', methods=['POST'])
 def add_employee():
     try:
