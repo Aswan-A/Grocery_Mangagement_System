@@ -1,7 +1,9 @@
 from errno import errorcode
+from mysql.connector import errorcode
 from flask import Blueprint, current_app, request, jsonify, render_template
 import mysql
 from app.db import get_auth_db_connection
+import bcrypt
 
 # Create a Blueprint for login-related routes
 bp = Blueprint('login', __name__)
@@ -9,9 +11,6 @@ bp = Blueprint('login', __name__)
 @bp.route('/')
 def home():
     return render_template('login.html')
-
-import bcrypt
-from flask import current_app, jsonify, request
 
 @bp.route('/login', methods=['POST'])
 def login():
@@ -21,37 +20,57 @@ def login():
     supermarket = data.get('supermarket')
     current_app.config['CURRENT_SUPERMARKET'] = supermarket
 
-    connection = get_auth_db_connection()
-    cursor = connection.cursor()
+    try:
+        auth_conn = get_auth_db_connection()
+        cursor = auth_conn.cursor()
 
-    # Fetch the user details from the database
-    query = "SELECT * FROM users WHERE username = %s"
-    cursor.execute(query, (username,))
-    user = cursor.fetchone()
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+
+        cursor.close()
+        auth_conn.close()
+    except mysql.connector.Error as err:
+        return jsonify({
+            'success': False,
+            'message': 'Error connecting to auth database.',
+            'error': str(err),
+            'role': None
+        }), 500
+
+    success = False
+    role = None
 
     if user:
-        stored_hash = user[2]  
-        role = user[3] 
+        stored_hash = user[2]
+        role = user[3]
 
-        # Verify the password using bcrypt
         if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
-            message = "Login successful!"
             success = True
+            message = "Login successful!"
         else:
             message = "Invalid username or password!"
-            success = False
-            role = None
     else:
         message = "Invalid username or password!"
-        success = False
-        role = None
 
-    cursor.close()
-    connection.close()
-    
-    create_tables()
-    create_age_check_trigger()
-    create_product_id_check_trigger()
+
+    if success:
+        try:
+            create_tables()
+            create_age_check_trigger()
+            create_product_id_check_trigger()
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_BAD_DB_ERROR:
+                return jsonify({
+                    'success': False,
+                    'message': f"Supermarket database '{supermarket}' does not exist.",
+                    'role': role
+                }), 500
+            return jsonify({
+                'success': False,
+                'message': 'Database setup error',
+                'error': str(err),
+                'role': role
+            }), 500
 
     return jsonify({
         'success': success,
@@ -59,14 +78,19 @@ def login():
         'role': role
     })
 
+
 def get_db_connection():
-    connection = mysql.connector.connect(
-        host=current_app.config['MYSQL_HOST'],
-        user=current_app.config['MYSQL_USER'],
-        password=current_app.config['MYSQL_PASSWORD'],
-        database=current_app.config.get('CURRENT_SUPERMARKET')
-    )
-    return connection
+    try:
+        con = mysql.connector.connect(
+            host=current_app.config['MYSQL_HOST'],
+            user=current_app.config['MYSQL_USER'],
+            password=current_app.config['MYSQL_PASSWORD'],
+            database=current_app.config.get('CURRENT_SUPERMARKET')
+        )
+        return con
+    except mysql.connector.Error as err:
+        raise err
+
 
 def create_tables():
     try:
@@ -129,7 +153,6 @@ def create_tables():
                 FOREIGN KEY (productId) REFERENCES stocks(productId) ON DELETE CASCADE
                 );
             """ 
-        
         cursor.execute(create_brands_table)
         cursor.execute(create_categories_table)
         cursor.execute(create_stocks_table)
@@ -145,13 +168,7 @@ def create_tables():
         print("Tables created and data inserted successfully.")
     
     except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your MySQL username or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
+        raise err
 
 def create_age_check_trigger():
     connection = get_db_connection()

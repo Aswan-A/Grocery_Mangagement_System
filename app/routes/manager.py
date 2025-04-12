@@ -19,7 +19,6 @@ def get_all_sales():
     stocks = cursor.fetchall()
     cursor.close()
     connection.close()
-    print(json.dumps(stocks, indent=4))  # Converts to readable JSON format
     return jsonify(stocks)
 
 @bp.route('api/stock', methods=['GET'])
