@@ -299,7 +299,26 @@ input[type="text"]:focus {
 #topSellingItems li:hover {
     background-color: #e0e0e0;
 }
-
+/*absent and present background*/
+.status-label {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: inline-block;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  
+  .status-present {
+    background-color: #28a745; /* Green */
+    color: white;
+  }
+  
+  .status-absent {
+    background-color: #dc3545; /* Red */
+    color: white;
+  }
+  
 /* Modal styling */
 .modal {
     display: none;

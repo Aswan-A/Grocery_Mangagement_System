@@ -66,59 +66,38 @@ def get_categories():
 
 
 
-# Route to get all attendance records
-@bp.route('/api/attendance', methods=['GET'])
-def get_all_attendance():
+@bp.route('/attendance/<date>')
+def get_attendance(date):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    query = """
-    SELECT 
-        attendance.employeeId, 
-        employees.employeeName,  -- Ensure this column exists
-        DATE_FORMAT(attendance.date, '%Y-%m-%d') AS formatted_date, 
-        attendance.status 
-    FROM attendance 
-    JOIN employees ON attendance.employeeId = employees.employeeId  
-    ORDER BY formatted_date DESC
-    """
-    
-    cursor.execute(query)
-    attendance = cursor.fetchall()
+    # Get all employees
+    cursor.execute("SELECT employeeId, employeeName FROM employees")
+    all_employees = cursor.fetchall()
+
+    # Get attendance records for that date
+    cursor.execute("SELECT employeeId, status FROM attendance WHERE Date = %s", (date,))
+    attendance_records = cursor.fetchall()
+
+    # Build a dictionary of employeeId -> status
+    attendance_dict = {record['employeeId']: record['status'] for record in attendance_records}
+
+    # Merge attendance info with employee list
+    attendance_list = []
+    for emp in all_employees:
+        status = attendance_dict.get(emp['employeeId'], 'absent')
+        attendance_list.append({
+            'employee_id': emp['employeeId'],
+            'employee_name': emp['employeeName'],
+            'date': date,
+            'status': status
+        })
 
     cursor.close()
     connection.close()
+    return jsonify(attendance_list)
 
-    # Rename 'formatted_date' to 'date' before returning
-    for row in attendance:
-        row['date'] = row.pop('formatted_date')
 
-    return jsonify(attendance)
-
-# Route to get absentee list
-@bp.route('/api/get_absentees', methods=['GET'])
-def get_absentees():
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)  # ✅ Use dictionary cursor for JSON response
-
-    date = request.args.get('date')
-    if not date:
-        return jsonify({"error": "Date is required"}), 400
-
-    query = """
-    SELECT e.employeeId, e.employeeName
-    FROM employees e
-    LEFT JOIN attendance a ON e.employeeId = a.employeeId AND a.date = %s
-    WHERE a.status IS NULL OR a.status = 'Absent';
-    """
-    
-    cursor.execute(query, (date,))
-    absentees = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return jsonify(absentees)
 
 # Route to get total sales
 @bp.route('/get_total_sales', methods=['GET'])

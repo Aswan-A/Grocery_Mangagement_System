@@ -28,10 +28,10 @@
                     <select id="categoryFilter">
                     </select>
                 </div>
-                <!-- <div id="attendanceFilter" class="filter-section">
+                <div id="attendanceFilter" class="filter-section">
                     <label for="dateFilter">Attendance Date:</label>
                     <input type="date" id="dateFilter">
-                </div> -->
+                </div> 
                 <!-- <div id="salesFilter" class="filter-section">
                     <label for="salesDateFilter">Sales Date:</label>
                     <input type="date" id="salesDateFilter">
@@ -60,8 +60,6 @@
             <section id="attendance" class="tab">
                 <h1>Employee Attendance</h1>
                 <input type="text" id="attendanceSearch" placeholder="Search attendance...">
-                <button id="getAbsenteesBtn" class="btn btn-warning">Get Absentees</button>
-                <input type="date" id="attendDate" required>
                 <table id="attendanceTable">
                     <thead>
                         <tr>
@@ -76,15 +74,6 @@
                     </tbody>
                 </table>
                 <!-- Absentees Popup -->
-                <div id="absenteesPopup" class="popup" style="display: none;">
-                    <div class="popup-content">
-                        <span id="closeAbsenteesPopup" class="close-btn">&times;</span>
-                        <h2>Absentees List</h2>
-                        <div id="absenteesList">
-                            <!-- List of absentees will be displayed here -->
-                        </div>
-                    </div>
-                </div>
             </section>
             <section id="sales" class="tab">
                 <h1>Sales Report</h1>
