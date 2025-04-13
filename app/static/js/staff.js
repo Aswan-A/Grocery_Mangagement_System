@@ -138,8 +138,8 @@ document.addEventListener("DOMContentLoaded", function () {
           // Populate the form with stock details
           document.getElementById("id").value = stock.productId;
           document.getElementById("product").value = stock.productName;
-          document.getElementById("brand").value = stock.brand;
-          document.getElementById("category").value = stock.category;
+          document.getElementById("brand").value = stock.brandName;
+          document.getElementById("category").value = stock.categoryName;
           document.getElementById("quantity").value = stock.quantity;
           document.getElementById("price").value = stock.price;
           document.getElementById("popup").querySelector("h2").textContent =
@@ -175,8 +175,8 @@ document.addEventListener("DOMContentLoaded", function () {
           stockDetails.innerHTML = `
                       <p><strong>Product ID:</strong> ${stock.productId}</p>
                       <p><strong>Product:</strong> ${stock.productName}</p>
-                      <p><strong>Brand:</strong> ${stock.brand}</p>
-                      <p><strong>Category:</strong> ${stock.category}</p>
+                      <p><strong>Brand:</strong> ${stock.brandName}</p>
+                      <p><strong>Category:</strong> ${stock.categoryName}</p>
                       <p><strong>Quantity:</strong> ${stock.quantity}</p>
                       <p><strong>Price:</strong> ${stock.price}</p>
                   `;

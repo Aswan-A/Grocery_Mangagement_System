@@ -129,13 +129,29 @@ def add_item():
 
 
 
-# Fetch single stock by product ID
+# Fetch single stock by product ID with brand and category names
 @staff_bp.route('/api/stock/<string:product_id>', methods=['GET'])
 def get_stock(product_id):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM stocks WHERE productId = %s", (product_id,))
-    stock = cursor.fetchone()  # Only fetch one row based on productId
+
+    query = """
+        SELECT 
+            s.productId,
+            s.productName,
+            s.quantity,
+            s.price,
+            b.brandName,
+            c.categoryName
+        FROM stocks s
+        LEFT JOIN brands b ON s.brandId = b.brandId
+        LEFT JOIN categories c ON s.categoryId = c.categoryId
+        WHERE s.productId = %s
+    """
+    
+    cursor.execute(query, (product_id,))
+    stock = cursor.fetchone()
+
     cursor.close()
     connection.close()
     
@@ -143,6 +159,7 @@ def get_stock(product_id):
         return jsonify(stock)
     else:
         return jsonify({"error": "Stock not found"}), 404
+
 
 
 
