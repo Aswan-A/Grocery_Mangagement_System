@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.getElementById("categoryFilter").addEventListener("change", function () {
     const selectedCategory = this.value.toLowerCase();
-    const rows = stockTable.getElementsByTagName("tr");
+    const rows = stockTable.querySelector("tbody").getElementsByTagName("tr");
     Array.from(rows).forEach((row) => {
       const category = row.cells[1].textContent.toLowerCase();
       row.style.display = category.includes(selectedCategory) ? "" : "none";
