@@ -85,6 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
           icon: 'warning',
           title: 'Oops!',
           text: '⚠️ Please fill in both Product ID and Quantity.',
+          timer:1000,
+          showConfirmButton: false
         });
         return;
       }
@@ -493,6 +495,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear existing absentees list
     absenteesList.innerHTML = "";
     const attenDate = document.getElementById("attendDate").value;
+    if (!attenDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Date Selected',
+        text: '⚠️ Please select a date.',
+        timer: 1000,
+        showConfirmButton: false
+      });
+      return;
+    }
     // console.log(attenDate);
     // Fetch absentee data from the server
     fetch(`/staff/api/get_absentees?date=${encodeURIComponent(attenDate)}`, {
@@ -533,19 +545,13 @@ document.addEventListener("DOMContentLoaded", function () {
     absenteesPopup.style.display = "none";
   });
 
-  // Optional: Close the popup when clicking outside of the popup content
+  //Close the popup when clicking outside of the popup content
   window.addEventListener("click", function (event) {
     if (event.target === absenteesPopup) {
       absenteesPopup.style.display = "none";
     }
   });
 
-  // Optional: Close the popup when clicking outside of the popup content
-  window.addEventListener("click", function (event) {
-    if (event.target === absenteesPopup) {
-      absenteesPopup.style.display = "none";
-    }
-  });
 
   // Get references to the input and button elements
   const attendanceIdInput = document.getElementById("attendanceId");
@@ -560,7 +566,8 @@ document.addEventListener("DOMContentLoaded", function () {
         icon: 'warning',
         title: 'Oops!',
         html: '<strong>Please enter a valid <u>Employee ID</u>.</strong>',
-        confirmButtonColor: '#ffc107',
+        timer:1000,
+        showConfirmButton: false
       });
 
       return;
