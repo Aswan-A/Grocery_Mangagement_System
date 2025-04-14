@@ -226,19 +226,13 @@ document.addEventListener('DOMContentLoaded', function () {
     tableBody.innerHTML = "";
 
     sales.forEach((sale) => {
-      let formattedDate = "Invalid Date";
-      if (sale.Date) {
-        const parsedDate = Date.parse(sale.Date);
-        if (!isNaN(parsedDate)) {
-          formattedDate = new Date(parsedDate).toLocaleDateString("en-GB");
-        }
-      }
 
       const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${formattedDate}</td>
-        <td>${sale.quantity ?? "N/A"}</td>
+      tr.innerHTML = ` 
+       <td>${sale.productId ?? "N/A"}</td>
         <td>${sale.productName ?? "N/A"}</td>
+        <td>${sale.quantity ?? "N/A"}</td>
+        <td>${sale.totalAmount ?? "N/A"}</td>
       `;
       tableBody.appendChild(tr);
     });

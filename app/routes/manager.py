@@ -20,15 +20,23 @@ def get_all_sales():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    query = """ SELECT s.Date, s.quantity, p.productName
+    query = """
+        SELECT
+            s.productId,
+            s.quantity * p.price AS totalAmount,
+            s.quantity,
+            p.productName
         FROM sales s
         JOIN stocks p ON s.productId = p.productId
-        WHERE DATE(s.Date) = %s"""
+        WHERE DATE(s.Date) = %s
+        ORDER BY s.productId ASC
+    """
     cursor.execute(query, (selected_date,))
     stocks = cursor.fetchall()
     cursor.close()
     connection.close()
     return jsonify(stocks)
+
 
 @bp.route('api/stock', methods=['GET'])
 def get_all_stocks():
