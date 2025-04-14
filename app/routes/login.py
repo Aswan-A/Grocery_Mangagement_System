@@ -217,7 +217,6 @@ def create_product_id_check_trigger():
         BEFORE INSERT ON stocks
         FOR EACH ROW
         BEGIN
-            -- Check if the productId already exists
             IF EXISTS (SELECT 1 FROM stocks WHERE productId = NEW.productId) THEN
                 SIGNAL SQLSTATE '45001'
                 SET MESSAGE_TEXT = 'Product with this ID already exists!';

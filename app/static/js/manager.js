@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const salesSearch = document.getElementById("salesSearch");
 
   const today = new Date().toISOString().split("T")[0];
-  const salesDate = document.getElementById("salesDate");
+  const salesDate = document.getElementById("salesDateFilter");
   const attendDateInput = document.getElementById("attendDate");
 
   if (dateFilter) {
@@ -20,8 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
     dateFilter.setAttribute("max", today);
     dateFilter.addEventListener("change", loadAttendanceData);
   }
+
   if (salesDate) salesDate.setAttribute("max", today);
   if (attendDateInput) attendDateInput.setAttribute("max", today);
+  salesDate.value=today;
 
   loadStocks();
   loadCategories();
@@ -206,9 +208,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // SALES
-  async function loadSalesData() {
+  async function loadSalesData(filterDate = "") {
     try {
-      const response = await fetch("/manager/api/sales");
+      const url = filterDate ? `/manager/api/sales?date=${filterDate}` : "/manager/api/sales";
+      const response = await fetch(url);  
       if (!response.ok) throw new Error("Failed to fetch sales data.");
       const data = await response.json();
       populateSalesTable(data);
@@ -235,11 +238,27 @@ document.addEventListener('DOMContentLoaded', function () {
       tr.innerHTML = `
         <td>${formattedDate}</td>
         <td>${sale.quantity ?? "N/A"}</td>
-        <td>${sale.productId ?? "N/A"}</td>
+        <td>${sale.productName ?? "N/A"}</td>
       `;
       tableBody.appendChild(tr);
     });
   }
+
+  document.getElementById("salesDateFilter")?.addEventListener("change", function () {
+    const selectedDate = this.value;
+    if (!selectedDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Date',
+        text: '⚠️ Please select a date.',
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      return;
+    }
+    loadSalesData(selectedDate);
+  });
+  
 
   salesSearch?.addEventListener("input", () => {
     const searchValue = salesSearch.value.toLowerCase();
@@ -256,7 +275,17 @@ document.addEventListener('DOMContentLoaded', function () {
   // GET TOTAL SALES
   document.getElementById("getTotalSalesBtn")?.addEventListener("click", function () {
     const selectedDate = salesDate?.value;
-    if (!selectedDate) return alert("Please select a date.");
+    if (!selectedDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Date',
+        text: '⚠️ Please select a date.',
+        timer: 1000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+    
 
     fetch(`/staff/get_total_sales?date=${selectedDate}`)
       .then(response => response.json())
@@ -270,7 +299,17 @@ document.addEventListener('DOMContentLoaded', function () {
   // GET TOP SELLING ITEMS (TOP 5)
   document.getElementById("getTopSellingItemsBtn")?.addEventListener("click", function () {
     const selectedDate = salesDate?.value;
-    if (!selectedDate) return alert("Please select a date.");
+    if (!selectedDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Date',
+        text: '⚠️ Please select a date.',
+        timer: 1000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+    
 
     fetch(`/staff/get_top_selling_items?date=${selectedDate}`)
       .then(response => response.json())

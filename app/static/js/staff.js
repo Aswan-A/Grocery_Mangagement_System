@@ -81,7 +81,11 @@ document.addEventListener("DOMContentLoaded", function () {
       let quantity = document.getElementById("addstckQuan").value.trim();
 
       if (!productId || !quantity) {
-        alert("⚠️ Please fill in both Product ID and Quantity.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops!',
+          text: '⚠️ Please fill in both Product ID and Quantity.',
+        });
         return;
       }
 
@@ -103,16 +107,34 @@ document.addEventListener("DOMContentLoaded", function () {
         let result = await response.json();
 
         if (response.ok) {
-          alert(`✅ Success: ${result.message}`);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: `✅ ${result.message}`,
+            confirmButtonColor: '#28a745', // green button
+          });
+
           loadStocks();
           addstckId.value = "";
           addstckQuan.value = "";
         } else {
-          alert(`❌ Error: ${result.error || "Something went wrong."}`);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `❌ ${result.error || "Something went wrong."}`,
+            confirmButtonColor: '#d33', // red button
+          });
+
         }
       } catch (error) {
         console.error("Network Error:", error);
-        alert("❌ A network error occurred. Please try again.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Network Error',
+          text: '❌ A network error occurred. Please try again.',
+          confirmButtonColor: '#d33',
+        });
+
       }
     });
 
@@ -221,7 +243,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => response.json())
         .then((data) => {
           if (data.success === false) {
-            alert(data.details); // <--- Show trigger error from backend
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops!',
+              text: `❌ ${data.details}`,
+              confirmButtonColor: '#d33',
+            });
+
           } else {
             console.log("Stock added:", data);
             loadStocks();
@@ -291,12 +319,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   employeeForm.addEventListener("submit", function (e) {
     e.preventDefault();
-  
+
     const employeeId = document.getElementById("employeeId").value;
-  
+
     const isEditing =
       document.getElementById("employeeSubmitBtn").textContent === "Update Employee";
-  
+
     const newEmployee = {
       employeeId: employeeId,
       employeeName: document.getElementById("employeeName").value,
@@ -305,13 +333,13 @@ document.addEventListener("DOMContentLoaded", function () {
       address: document.getElementById("employeeAddress").value,
       joinDate: document.getElementById("joinDate").value,
     };
-  
+    
     const url = isEditing
-      ? `/staff/api/employee/${employeeId}`   // <-- PUT to /staff/api/employee/34
-      : "/staff/api/employee";                // <-- POST to /staff/api/employee
-  
+      ? `/staff/api/employee/${employeeId}`
+      : "/staff/api/employee";
+
     const method = isEditing ? "PUT" : "POST";
-  
+
     fetch(url, {
       method: method,
       headers: {
@@ -322,12 +350,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.success === false) {
-          alert(data.details);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.details || 'An unknown error occurred.',
+          });
+
         } else {
           console.log(isEditing ? "Employee updated:" : "Employee added:", data);
           loadEmployees();
           employeePopup.style.display = "none";
-  
+
           // Reset popup to default
           document.getElementById("employeePopup").querySelector("h2").textContent = "Add New Employee";
           document.getElementById("employeeSubmitBtn").textContent = "Add Employee";
@@ -336,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((err) => console.error("Error saving employee:", err));
   });
-  
+
   // Delete employee
   employeeTable.addEventListener("click", function (e) {
     // Delete employee
@@ -356,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (e.target.classList.contains("view-btn-emp")) {
       const employeeId = e.target.getAttribute("data-id");
-      fetch(`/staff/api/employee/${employeeId}`,{method: "GET",})
+      fetch(`/staff/api/employee/${employeeId}`, { method: "GET", })
         .then((response) => response.json())
         .then((employee) => {
           const employeeDetails = document.getElementById("employeeDetails");
@@ -385,32 +418,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Handle Edit employee button click
-    // Handle Edit employee button click
     if (e.target.classList.contains("edit-btn-emp")) {
       const employeeId = e.target.getAttribute("data-id");
-    
+
       fetch(`/staff/api/employee/${employeeId}`)
         .then((response) => response.json())
         .then((employee) => {
           console.log(employee); // 🔥 Check if DOB/joinDate is correct
-    
+
           document.getElementById("employeePopup").querySelector("h2").textContent = "Edit Employee";
           document.getElementById("employeeSubmitBtn").textContent = "Update Employee";
-    
+
           document.getElementById("employeeId").value = employee.employeeId;
           document.getElementById("employeeName").value = employee.employeeName;
           document.getElementById("mobileNumber").value = employee.mobileNumber;
-    
+
           const dobISO = new Date(employee.DOB).toISOString().split('T')[0];
           const joinDateISO = new Date(employee.joinDate).toISOString().split('T')[0];
-        
-          document.getElementById("employeeDob").value = dobISO;   
+
+          document.getElementById("employeeDob").value = dobISO;
           document.getElementById("joinDate").value = joinDateISO;
-        
+
           document.getElementById("employeeAddress").value = employee.address;
-        
+
           document.getElementById("employeePopup").style.display = "flex";
-        
+
           employeeForm.setAttribute("data-editing", "true");
           employeeForm.setAttribute("data-employee-id", employeeId);
         })
@@ -418,9 +450,9 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error("Error fetching employee details:", error);
         });
     }
-    
 
-    
+
+
   });
 
   // Close employee details popup
@@ -524,7 +556,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const employeeId = attendanceIdInput.value.trim();
 
     if (employeeId === "") {
-      alert("Please enter a valid Employee ID");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops!',
+        html: '<strong>Please enter a valid <u>Employee ID</u>.</strong>',
+        confirmButtonColor: '#ffc107',
+      });
+
       return;
     }
 
@@ -542,15 +580,31 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          alert("Attendance recorded successfully");
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '✅ Attendance recorded successfully',
+            confirmButtonColor: '#28a745',
+          });
         } else {
-          alert("Error recording attendance");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '❌ Error recording attendance',
+            confirmButtonColor: '#d33',
+          });
         }
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("Failed to record attendance");
+        Swal.fire({
+          icon: 'error',
+          title: 'Network Error',
+          text: '❌ Failed to record attendance',
+          confirmButtonColor: '#d33',
+        });
       });
+
   });
 
   let billItems = [];
@@ -565,16 +619,33 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          alert("Product not found.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Product Not Found',
+            text: '❌ Product not found.',
+            confirmButtonColor: '#d33',
+          });
         } else if (data.quantity <= 0) {
-          alert("Out of stock.");
+          Swal.fire({
+            icon: 'warning',
+            title: 'Out of Stock',
+            text: '⚠️ The product is out of stock.',
+            confirmButtonColor: '#f0ad4e',
+          });
         } else {
-          addProductToBill(data);
+          addProductToBill(data); // Continue your normal flow here
         }
       })
       .catch((error) => {
-        alert("An error occurred while searching for the product.");
+        console.error("Error:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: '❌ An error occurred while searching for the product.',
+          confirmButtonColor: '#d33',
+        });
       });
+      
 
     document.getElementById("billingSearch").value = "";
   }
@@ -591,68 +662,91 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-  // Add product to bill or update existing product's quantity
-  function addProductToBill(product) {
-    const availableQuantity = product.quantity;
-
-    document.getElementById("billingSearch").value = "";
-
-    const existingProductIndex = billItems.findIndex(
-      (item) => item.productId === product.productId
-    );
-
-    if (existingProductIndex !== -1) {
-      const existingProduct = billItems[existingProductIndex];
-      let quantity = prompt(
-        `Enter quantity for this product (Available quantity: ${availableQuantity})`,
-        existingProduct.quantity
+    function addProductToBill(product) {
+      const availableQuantity = product.quantity;
+    
+      document.getElementById("billingSearch").value = "";
+    
+      const existingProductIndex = billItems.findIndex(
+        (item) => item.productId === product.productId
       );
-
-      while (quantity && (quantity <= 0 || quantity > availableQuantity)) {
-        if (quantity > availableQuantity) {
-          alert(`Invalid quantity. Available quantity: ${availableQuantity}`);
-        }
-        quantity = prompt(
-          `Enter quantity for this product (Available quantity: ${availableQuantity})`,
-          existingProduct.quantity
-        );
-      }
-
-      if (quantity && quantity > 0) {
-        existingProduct.quantity = parseInt(quantity);
-        existingProduct.total =
-          existingProduct.price * existingProduct.quantity;
-        updateBillTable();
-      }
-    } else {
-      let quantity = prompt(
-        `Enter quantity for this product (Available quantity: ${availableQuantity})`,
-        1
-      );
-
-      while (quantity && (quantity <= 0 || quantity > availableQuantity)) {
-        if (quantity > availableQuantity) {
-          alert(`Invalid quantity. Available quantity: ${availableQuantity}`);
-        }
-        quantity = prompt(
-          `Enter quantity for this product (Available quantity: ${availableQuantity})`,
-          1
-        );
-      }
-
-      if (quantity && quantity > 0) {
-        const total = product.price * quantity;
-        billItems.push({
-          productId: product.productId,
-          productName: product.productName,
-          price: product.price,
-          quantity: parseInt(quantity),
-          total: total,
+    
+      if (existingProductIndex !== -1) {
+        const existingProduct = billItems[existingProductIndex];
+        
+        Swal.fire({
+          title: `Enter quantity for<br><strong>${product.productName}</strong>`,
+          text: `Available quantity: ${availableQuantity}`,
+          input: 'number',
+          inputValue: existingProduct.quantity,
+          inputAttributes: {
+            min: 1,
+            max: availableQuantity,
+            step: 1
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Update',
+          cancelButtonText: 'Cancel',
+          preConfirm: (quantity) => {
+            if (quantity <= 0 || quantity > availableQuantity) {
+              Swal.showValidationMessage(
+                `Please enter a valid quantity between 1 and ${availableQuantity}`
+              );
+            }
+            return quantity;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const quantity = result.value;
+            if (quantity > 0) {
+              existingProduct.quantity = parseInt(quantity);
+              existingProduct.total = existingProduct.price * existingProduct.quantity;
+              updateBillTable();
+            }
+          }
         });
-        updateBillTable();
+    
+      } else {
+        Swal.fire({
+          title: `Enter quantity for<br><strong>${product.productName}</strong>`,
+          text: `Available quantity: ${availableQuantity}`,
+          input: 'number',
+          inputValue: 1,
+          inputAttributes: {
+            min: 1,
+            max: availableQuantity,
+            step: 1
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Add to Bill',
+          cancelButtonText: 'Cancel',
+          preConfirm: (quantity) => {
+            if (quantity <= 0 || quantity > availableQuantity) {
+              Swal.showValidationMessage(
+                `Please enter a valid quantity between 1 and ${availableQuantity}`
+              );
+            }
+            return quantity;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const quantity = result.value;
+            if (quantity > 0) {
+              const total = product.price * quantity;
+              billItems.push({
+                productId: product.productId,
+                productName: product.productName,
+                price: product.price,
+                quantity: parseInt(quantity),
+                total: total,
+              });
+              updateBillTable();
+            }
+          }
+        });
       }
     }
-  }
+    
 
   // Update the billing table with items
   function updateBillTable() {
@@ -703,7 +797,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Generate bill
   function generateBill() {
     if (billItems.length === 0) {
-      alert("No items in the bill.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Items',
+        text: '⚠️ No items in the bill.',
+        timer: 1000,
+        showConfirmButton: false,
+      });
+      
       return;
     }
 
@@ -717,18 +818,35 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
-          alert(data.error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error,
+            confirmButtonColor: '#d33', // Red button color
+          });
         } else {
-          alert(`Bill generated successfully! Total: ₹${data.totalAmount}`);
-          billItems = [];
-          updateBillTable();
-          loadStocks();
+          Swal.fire({
+            icon: 'success',
+            title: 'Bill Generated',
+            text: `✅ Bill generated successfully! Total: ₹${data.totalAmount}`,
+            confirmButtonColor: '#28a745', // Green success color
+          }).then(() => {
+            billItems = [];
+            updateBillTable();
+            loadStocks();
+          });
         }
       })
       .catch((error) => {
         console.error("Error generating bill:", error);
-        alert("An error occurred while generating the bill.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: '❌ An error occurred while generating the bill.',
+          confirmButtonColor: '#d33', // Red button color
+        });
       });
+      
   }
 
   document
@@ -737,7 +855,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const selectedDate = document.getElementById("salesDate").value;
 
       if (!selectedDate) {
-        alert("Please select a date.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Date',
+          text: '⚠️ Please select a date.',
+          timer: 1500,  // Auto-close after 1.5 seconds
+          showConfirmButton: false, // Hide the confirm button
+        });
+        
+        
         return;
       }
 
@@ -758,7 +884,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const selectedDate = document.getElementById("salesDate").value;
 
       if (!selectedDate) {
-        alert("Please select a date.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Date',
+          text: '⚠️ Please select a date.',
+          timer: 1500,  // Auto-close after 1.5 seconds
+          showConfirmButton: false, // Hide the confirm button
+        });
+        
         return;
       }
 
@@ -770,9 +903,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
           data.top_selling_items.forEach((item, index) => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${index + 1}. ${item.productName} - ${
-              item.total_quantity
-            } sold`;
+            listItem.textContent = `${index + 1}. ${item.productName} - ${item.total_quantity
+              } sold`;
             itemList.appendChild(listItem);
           });
         })

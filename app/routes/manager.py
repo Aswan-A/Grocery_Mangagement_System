@@ -13,9 +13,18 @@ def manager_dashboard():
 
 @bp.route('/api/sales', methods=['GET'])
 def get_all_sales():
+    selected_date = request.args.get('date')
+    if not selected_date:
+        selected_date = datetime.today().strftime('%Y-%m-%d')
+
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT `Date`,quantity,productId FROM sales")
+
+    query = """ SELECT s.Date, s.quantity, p.productName
+        FROM sales s
+        JOIN stocks p ON s.productId = p.productId
+        WHERE DATE(s.Date) = %s"""
+    cursor.execute(query, (selected_date,))
     stocks = cursor.fetchall()
     cursor.close()
     connection.close()
