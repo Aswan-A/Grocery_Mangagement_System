@@ -18,7 +18,7 @@ def get_auth_db_connection():
 def create_auth_tables():
     try:
         # Establishing connection to MySQL
-        connection = get_auth_db_connection()  # Replace with your connection method
+        connection = get_auth_db_connection()  
         cursor = connection.cursor()
 
         # SQL statements for creating the tables

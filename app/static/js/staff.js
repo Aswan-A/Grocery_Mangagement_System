@@ -354,8 +354,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.success === false) {
           Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: data.details || 'An unknown error occurred.',
+            title: 'Oops!',
+            text: `❌ ${data.details}`,
+            confirmButtonColor: '#d33',
           });
 
         } else {
